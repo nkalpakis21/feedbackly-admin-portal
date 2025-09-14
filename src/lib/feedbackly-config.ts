@@ -1,7 +1,46 @@
 /**
  * Feedbackly SDK Configuration for Admin Portal
+ * Supports both NPM package and local development modes
  */
 
+// Environment-based SDK source configuration
+export interface FeedbacklySourceConfig {
+    useLocalSDK: boolean;
+    localSDKPath?: string;
+    npmPackageVersion?: string;
+}
+
+// Environment configuration for SDK source
+const getFeedbacklySourceConfig = (): FeedbacklySourceConfig => {
+    // Check for environment variable first
+    const useLocalSDK = process.env.NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK === 'true';
+
+    // Check for URL parameter (for easy testing)
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const urlUseLocal = urlParams?.get('use-local-sdk') === 'true';
+
+    // Default to npm package in production, local in development
+    const defaultUseLocal = process.env.NODE_ENV === 'development';
+
+    return {
+        useLocalSDK: useLocalSDK || urlUseLocal || defaultUseLocal,
+        localSDKPath: process.env.NEXT_PUBLIC_LOCAL_FEEDBACKLY_PATH || '../feedbackly-sdk',
+        npmPackageVersion: process.env.NEXT_PUBLIC_FEEDBACKLY_VERSION || '^1.0.0'
+    };
+};
+
+export const feedbacklySourceConfig = getFeedbacklySourceConfig();
+
+// Log current configuration in development
+if (process.env.NODE_ENV === 'development') {
+    console.log('🔧 Feedbackly SDK Configuration:', {
+        useLocalSDK: feedbacklySourceConfig.useLocalSDK,
+        source: feedbacklySourceConfig.useLocalSDK ? 'Local Development' : 'NPM Package',
+        version: feedbacklySourceConfig.useLocalSDK ? 'Local' : feedbacklySourceConfig.npmPackageVersion
+    });
+}
+
+// Widget Configuration
 export const FEEDBACKLY_CONFIG = {
     // API Configuration
     apiKey: process.env.NEXT_PUBLIC_FEEDBACKLY_API_KEY || '',
@@ -76,3 +115,7 @@ export const FEEDBACKLY_EVENTS = {
 } as const;
 
 export type FeedbacklyEvent = typeof FEEDBACKLY_EVENTS[keyof typeof FEEDBACKLY_EVENTS];
+
+// Export both configurations for backward compatibility
+export const feedbacklyConfig = feedbacklySourceConfig;
+export default feedbacklySourceConfig;

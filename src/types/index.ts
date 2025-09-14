@@ -8,6 +8,40 @@ export interface User {
     isActive: boolean;
 }
 
+// Firestore document types
+export interface UserDocument {
+    id: string;
+    email: string;
+    name?: string;
+    website?: string;
+    createdAt: Date;
+    lastLogin?: Date;
+    isActive: boolean;
+}
+
+// User management types
+export interface CreateUserRequest {
+    email: string;
+    name?: string;
+    website?: string;
+}
+
+export interface UpdateUserRequest {
+    name?: string;
+    website?: string;
+    isActive?: boolean;
+}
+
+export interface UserProfile {
+    id: string;
+    email: string;
+    name?: string;
+    website?: string;
+    createdAt: Date;
+    lastLogin?: Date;
+    isActive: boolean;
+}
+
 export interface Feedback {
     id: string;
     userId: string;

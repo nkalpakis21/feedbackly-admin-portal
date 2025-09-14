@@ -2,6 +2,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import FeedbacklyWidget from '@/components/FeedbacklyWidget';
+import FeedbacklyDevToggle from '@/components/FeedbacklyDevToggle';
 import { FeedbacklyProvider } from '@/contexts/FeedbacklyContext';
 import { FEEDBACKLY_CONFIG } from '@/lib/feedbackly-config';
 
@@ -21,6 +22,8 @@ export default function DashboardLayout({
               {children}
             </main>
           </div>
+          {/* Development Toggle - Only shows in development */}
+          <FeedbacklyDevToggle />
           {/* Feedbackly Widget - Only shows when user is logged in */}
           <FeedbacklyWidget
             apiKey={FEEDBACKLY_CONFIG.apiKey}

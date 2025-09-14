@@ -4,12 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:local-sdk": "NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=true next dev --turbopack",
+    "dev:npm-sdk": "NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=false next dev --turbopack",
     "build": "next build --turbopack",
+    "build:local-sdk": "NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=true next build --turbopack",
+    "build:npm-sdk": "NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=false next build --turbopack",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
     "firebase": "^12.2.1",
+    "feedbackly-sdk": "^1.0.0",
     "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0"
