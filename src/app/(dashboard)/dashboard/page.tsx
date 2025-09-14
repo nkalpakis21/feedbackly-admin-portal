@@ -1,7 +1,22 @@
+'use client';
+
+import { useEffect } from 'react';
 import DashboardStats from '@/components/DashboardStats';
 import RecentFeedback from '@/components/RecentFeedback';
+import { useFeedbackly } from '@/hooks/useFeedbackly';
+import { FEEDBACKLY_EVENTS } from '@/lib/feedbackly-config';
 
 export default function DashboardPage() {
+  const { trackEvent } = useFeedbackly();
+
+  useEffect(() => {
+    // Track dashboard page view
+    trackEvent(FEEDBACKLY_EVENTS.DASHBOARD_VIEWED, {
+      page: 'dashboard',
+      timestamp: new Date().toISOString(),
+    });
+  }, [trackEvent]);
+
   return (
     <div className="space-y-6">
       <div>
