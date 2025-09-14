@@ -78,8 +78,8 @@ export default function RecentFeedback() {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-2">
                     {item.rating && (
-                      <span className="text-yellow-500">
-                        {'⭐'.repeat(item.rating)}
+                      <span className="text-lg">
+                        {item.rating === 1 ? '😞' : item.rating === 2 ? '😐' : item.rating === 3 ? '😍' : '⭐'.repeat(item.rating)}
                       </span>
                     )}
                     {item.sentiment && (

@@ -99,8 +99,8 @@ export default function FeedbackPage() {
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-2">
                       {item.rating && (
-                        <span className="text-yellow-500">
-                          {'⭐'.repeat(item.rating)}
+                        <span className="text-lg">
+                          {item.rating === 1 ? '😞' : item.rating === 2 ? '😐' : item.rating === 3 ? '😍' : '⭐'.repeat(item.rating)}
                         </span>
                       )}
                       {item.sentiment && (

@@ -1,4 +1,8 @@
-import { createElement, addEventListeners, removeEventListeners } from '../utils/dom';
+import {
+  createElement,
+  addEventListeners,
+  removeEventListeners,
+} from '../utils/dom';
 
 /**
  * Feedback Widget Component
@@ -14,8 +18,8 @@ class FeedbackWidget {
     this.feedbackForm = null;
     this.rating = 0;
     this.feedbackText = '';
-    this.eventListeners = null;
-    
+    this.eventListeners = null; // Store event listeners for cleanup
+
     this.init();
   }
 
@@ -40,17 +44,20 @@ class FeedbackWidget {
         position: 'fixed',
         bottom: this.config.position?.bottom || '20px',
         right: this.config.position?.right || '20px',
-        width: this.config.size?.width || '350px',
-        height: this.config.size?.height || '500px',
+        width: this.config.size?.width || '400px',
+        maxWidth: '90vw',
         backgroundColor: this.config.theme?.backgroundColor || '#ffffff',
-        border: `1px solid ${this.config.theme?.borderColor || '#e1e5e9'}`,
-        borderRadius: this.config.theme?.borderRadius || '8px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+        border: `1px solid ${this.config.theme?.borderColor || '#e5e7eb'}`,
+        borderRadius: '16px',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
         zIndex: this.config.zIndex || 9999,
         display: 'none',
-        fontFamily: this.config.theme?.fontFamily || 'system-ui, -apple-system, sans-serif',
+        fontFamily:
+          this.config.theme?.fontFamily ||
+          'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         fontSize: this.config.theme?.fontSize || '14px',
-        color: this.config.theme?.textColor || '#333333',
+        color: this.config.theme?.textColor || '#374151',
+        overflow: 'hidden',
       },
     });
 
@@ -68,23 +75,20 @@ class FeedbackWidget {
     const header = createElement('div', {
       className: 'feedbackly-header',
       style: {
-        padding: '16px',
-        borderBottom: `1px solid ${this.config.theme?.borderColor || '#e1e5e9'}`,
-        backgroundColor: this.config.theme?.headerBackgroundColor || '#f8f9fa',
-        borderRadius: `${this.config.theme?.borderRadius || '8px'} ${this.config.theme?.borderRadius || '8px'} 0 0`,
+        padding: '24px 24px 16px 24px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
       },
     });
 
-    const title = createElement('h3', {
-      textContent: this.config.text?.title || 'Share Your Feedback',
+    const title = createElement('h2', {
+      textContent: 'Quick Feedback',
       style: {
         margin: 0,
-        fontSize: '16px',
+        fontSize: '20px',
         fontWeight: '600',
-        color: this.config.theme?.textColor || '#333333',
+        color: this.config.theme?.textColor || '#111827',
       },
     });
 
@@ -96,13 +100,25 @@ class FeedbackWidget {
         border: 'none',
         fontSize: '20px',
         cursor: 'pointer',
-        color: this.config.theme?.textColor || '#333333',
-        padding: '0',
-        width: '24px',
-        height: '24px',
+        color: this.config.theme?.textColor || '#6b7280',
+        padding: '8px',
+        width: '32px',
+        height: '32px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        borderRadius: '6px',
+        transition: 'background-color 0.2s ease',
+      },
+    });
+
+    // Add hover effect for close button
+    addEventListeners(closeButton, {
+      mouseenter: () => {
+        closeButton.style.backgroundColor = '#f3f4f6';
+      },
+      mouseleave: () => {
+        closeButton.style.backgroundColor = 'transparent';
       },
     });
 
@@ -123,7 +139,7 @@ class FeedbackWidget {
     const formContainer = createElement('div', {
       className: 'feedbackly-form-container',
       style: {
-        padding: '16px',
+        padding: '0 24px',
         flex: 1,
         overflow: 'auto',
       },
@@ -147,61 +163,93 @@ class FeedbackWidget {
   }
 
   /**
-   * Create rating section
+   * Create rating section with emoji-based rating
    */
   createRatingSection() {
     const ratingContainer = createElement('div', {
       className: 'feedbackly-rating',
       style: {
-        marginBottom: '16px',
+        marginBottom: '20px',
       },
     });
 
-    const ratingLabel = createElement('label', {
-      textContent: this.config.text?.ratingLabel || 'How would you rate your experience?',
+    const ratingLabel = createElement('p', {
+      textContent: 'Rate your experience',
       style: {
-        display: 'block',
-        marginBottom: '8px',
+        fontSize: '14px',
         fontWeight: '500',
+        color: this.config.theme?.textColor || '#374151',
+        marginBottom: '12px',
+        margin: '0 0 12px 0',
       },
     });
 
-    const starsContainer = createElement('div', {
-      className: 'feedbackly-stars',
+    const emojiContainer = createElement('div', {
+      className: 'feedbackly-emoji-rating',
       style: {
         display: 'flex',
-        gap: '4px',
+        gap: '8px',
+        justifyContent: 'center',
       },
     });
 
-    // Create 5 stars
-    for (let i = 1; i <= 5; i++) {
-      const star = createElement('button', {
-        className: 'feedbackly-star',
-        'data-rating': i,
-        innerHTML: '★',
+    // Create emoji rating options
+    const ratingOptions = [
+      { value: 1, emoji: '😞', label: 'Poor' },
+      { value: 2, emoji: '😐', label: 'Okay' },
+      { value: 3, emoji: '😍', label: 'Great' },
+    ];
+
+    ratingOptions.forEach((option) => {
+      const emojiButton = createElement('button', {
+        className: 'feedbackly-emoji-option',
+        'data-rating': option.value,
         style: {
-          background: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '4px',
+          padding: '12px',
+          borderRadius: '12px',
+          background: 'transparent',
           border: 'none',
-          fontSize: '24px',
           cursor: 'pointer',
-          color: '#ddd',
-          padding: '0',
-          transition: 'color 0.2s ease',
+          transition: 'all 0.2s ease',
+          minWidth: '60px',
         },
       });
 
-      addEventListeners(star, {
-        click: () => this.setRating(i),
-        mouseenter: () => this.highlightStars(i),
-        mouseleave: () => this.resetStarHighlight(),
+      const emoji = createElement('span', {
+        textContent: option.emoji,
+        style: {
+          fontSize: '24px',
+          lineHeight: '1',
+        },
       });
 
-      starsContainer.appendChild(star);
-    }
+      const label = createElement('span', {
+        textContent: option.label,
+        style: {
+          fontSize: '12px',
+          fontWeight: '500',
+          color: this.config.theme?.textColor || '#6b7280',
+        },
+      });
+
+      emojiButton.appendChild(emoji);
+      emojiButton.appendChild(label);
+
+      addEventListeners(emojiButton, {
+        click: () => this.setRating(option.value),
+        mouseenter: () => this.highlightEmojiOption(option.value),
+        mouseleave: () => this.updateEmojiDisplay(),
+      });
+
+      emojiContainer.appendChild(emojiButton);
+    });
 
     ratingContainer.appendChild(ratingLabel);
-    ratingContainer.appendChild(starsContainer);
+    ratingContainer.appendChild(emojiContainer);
 
     return ratingContainer;
   }
@@ -213,32 +261,38 @@ class FeedbackWidget {
     const textContainer = createElement('div', {
       className: 'feedbackly-text',
       style: {
-        marginBottom: '16px',
+        marginBottom: '20px',
       },
     });
 
     const textLabel = createElement('label', {
-      textContent: this.config.text?.feedbackLabel || 'Tell us more (optional)',
+      textContent: 'Comments (optional)',
       style: {
         display: 'block',
-        marginBottom: '8px',
+        fontSize: '14px',
         fontWeight: '500',
+        color: this.config.theme?.textColor || '#374151',
+        marginBottom: '8px',
       },
     });
 
     this.feedbackTextarea = createElement('textarea', {
       className: 'feedbackly-textarea',
-      placeholder: this.config.text?.feedbackPlaceholder || 'Share your thoughts, suggestions, or report any issues...',
+      placeholder: 'Share your thoughts...',
       style: {
         width: '100%',
         minHeight: '80px',
-        padding: '8px',
-        border: `1px solid ${this.config.theme?.borderColor || '#e1e5e9'}`,
-        borderRadius: '4px',
+        padding: '12px',
+        border: `1px solid ${this.config.theme?.borderColor || '#d1d5db'}`,
+        borderRadius: '8px',
         fontSize: '14px',
         fontFamily: 'inherit',
-        resize: 'vertical',
+        resize: 'none',
         boxSizing: 'border-box',
+        backgroundColor: this.config.theme?.backgroundColor || '#ffffff',
+        color: this.config.theme?.textColor || '#374151',
+        outline: 'none',
+        transition: 'border-color 0.2s ease',
       },
     });
 
@@ -247,6 +301,12 @@ class FeedbackWidget {
       input: () => {
         this.feedbackText = this.feedbackTextarea.value;
         this.autoResizeTextarea();
+      },
+      focus: () => {
+        this.feedbackTextarea.style.borderColor = '#3b82f6';
+      },
+      blur: () => {
+        this.feedbackTextarea.style.borderColor = this.config.theme?.borderColor || '#d1d5db';
       },
     });
 
@@ -263,16 +323,18 @@ class FeedbackWidget {
     const categoryContainer = createElement('div', {
       className: 'feedbackly-category',
       style: {
-        marginBottom: '16px',
+        marginBottom: '20px',
       },
     });
 
     const categoryLabel = createElement('label', {
-      textContent: this.config.text?.categoryLabel || 'Category',
+      textContent: 'Category (optional)',
       style: {
         display: 'block',
-        marginBottom: '8px',
+        fontSize: '14px',
         fontWeight: '500',
+        color: this.config.theme?.textColor || '#374151',
+        marginBottom: '8px',
       },
     });
 
@@ -280,19 +342,23 @@ class FeedbackWidget {
       className: 'feedbackly-select',
       style: {
         width: '100%',
-        padding: '8px',
-        border: `1px solid ${this.config.theme?.borderColor || '#e1e5e9'}`,
-        borderRadius: '4px',
+        padding: '12px',
+        border: `1px solid ${this.config.theme?.borderColor || '#d1d5db'}`,
+        borderRadius: '8px',
         fontSize: '14px',
         fontFamily: 'inherit',
-        backgroundColor: 'white',
+        backgroundColor: this.config.theme?.backgroundColor || '#ffffff',
+        color: this.config.theme?.textColor || '#374151',
+        outline: 'none',
+        transition: 'border-color 0.2s ease',
+        cursor: 'pointer',
       },
     });
 
     // Add default option
     const defaultOption = createElement('option', {
       value: '',
-      textContent: 'Select a category (optional)',
+      textContent: 'Select category',
     });
     this.categorySelect.appendChild(defaultOption);
 
@@ -303,6 +369,16 @@ class FeedbackWidget {
         textContent: category.label,
       });
       this.categorySelect.appendChild(option);
+    });
+
+    // Add focus/blur event listeners
+    addEventListeners(this.categorySelect, {
+      focus: () => {
+        this.categorySelect.style.borderColor = '#3b82f6';
+      },
+      blur: () => {
+        this.categorySelect.style.borderColor = this.config.theme?.borderColor || '#d1d5db';
+      },
     });
 
     categoryContainer.appendChild(categoryLabel);
@@ -318,44 +394,71 @@ class FeedbackWidget {
     const footer = createElement('div', {
       className: 'feedbackly-footer',
       style: {
-        padding: '16px',
-        borderTop: `1px solid ${this.config.theme?.borderColor || '#e1e5e9'}`,
-        backgroundColor: this.config.theme?.footerBackgroundColor || '#f8f9fa',
-        borderRadius: `0 0 ${this.config.theme?.borderRadius || '8px'} ${this.config.theme?.borderRadius || '8px'}`,
+        padding: '24px 24px 24px 24px',
         display: 'flex',
-        gap: '8px',
-        justifyContent: 'flex-end',
+        gap: '12px',
+        justifyContent: 'space-between',
       },
     });
 
     const cancelButton = createElement('button', {
       className: 'feedbackly-cancel',
-      textContent: this.config.text?.cancelButton || 'Cancel',
+      textContent: 'Cancel',
       style: {
-        padding: '8px 16px',
-        border: `1px solid ${this.config.theme?.borderColor || '#e1e5e9'}`,
-        borderRadius: '4px',
-        backgroundColor: 'white',
-        color: this.config.theme?.textColor || '#333333',
+        flex: '1',
+        padding: '12px 16px',
+        border: `1px solid ${this.config.theme?.borderColor || '#d1d5db'}`,
+        borderRadius: '8px',
+        backgroundColor: 'transparent',
+        color: this.config.theme?.textColor || '#374151',
         cursor: 'pointer',
         fontSize: '14px',
         fontFamily: 'inherit',
+        fontWeight: '500',
+        transition: 'all 0.2s ease',
       },
     });
 
     const submitButton = createElement('button', {
       className: 'feedbackly-submit',
-      textContent: this.config.text?.submitButton || 'Submit',
+      textContent: 'Submit',
+      disabled: true,
       style: {
-        padding: '8px 16px',
+        flex: '1',
+        padding: '12px 16px',
         border: 'none',
-        borderRadius: '4px',
-        backgroundColor: this.config.theme?.primaryColor || '#007bff',
+        borderRadius: '8px',
+        backgroundColor: '#3b82f6',
         color: 'white',
-        cursor: 'pointer',
+        cursor: 'not-allowed',
         fontSize: '14px',
         fontFamily: 'inherit',
         fontWeight: '500',
+        transition: 'all 0.2s ease',
+        opacity: '0.5',
+      },
+    });
+
+    // Add hover effects
+    addEventListeners(cancelButton, {
+      mouseenter: () => {
+        cancelButton.style.backgroundColor = '#f9fafb';
+      },
+      mouseleave: () => {
+        cancelButton.style.backgroundColor = 'transparent';
+      },
+    });
+
+    addEventListeners(submitButton, {
+      mouseenter: () => {
+        if (this.rating > 0) {
+          submitButton.style.backgroundColor = '#2563eb';
+        }
+      },
+      mouseleave: () => {
+        if (this.rating > 0) {
+          submitButton.style.backgroundColor = '#3b82f6';
+        }
       },
     });
 
@@ -421,23 +524,27 @@ class FeedbackWidget {
    * Attach event listeners
    */
   attachEventListeners() {
-    // Store event listeners for proper cleanup
+    // Store event listeners for cleanup
     this.eventListeners = {
-      click: (event) => {
-        if (this.isVisible && 
-            !this.widgetElement.contains(event.target) && 
-            !this.triggerButton.contains(event.target)) {
+      click: event => {
+        if (
+          this.isVisible &&
+          this.widgetElement &&
+          this.triggerButton &&
+          !this.widgetElement.contains(event.target) &&
+          !this.triggerButton.contains(event.target)
+        ) {
           this.hide();
         }
       },
-      keydown: (event) => {
+      keydown: event => {
         if (event.key === 'Escape' && this.isVisible) {
           this.hide();
         }
       },
     };
 
-    // Attach the event listeners
+    // Add event listeners to document
     addEventListeners(document, this.eventListeners);
   }
 
@@ -460,36 +567,62 @@ class FeedbackWidget {
    */
   setRating(rating) {
     this.rating = rating;
-    this.updateStarDisplay();
+    this.updateEmojiDisplay();
+    this.updateSubmitButton();
   }
 
   /**
-   * Update star display
+   * Update emoji display
    */
-  updateStarDisplay() {
-    const stars = this.widgetElement.querySelectorAll('.feedbackly-star');
-    stars.forEach((star) => {
-      const starRating = parseInt(star.dataset.rating);
-      star.style.color = starRating <= this.rating ? '#ffc107' : '#ddd';
+  updateEmojiDisplay() {
+    const emojiOptions = this.widgetElement.querySelectorAll('.feedbackly-emoji-option');
+    emojiOptions.forEach(option => {
+      const optionRating = parseInt(option.dataset.rating);
+      if (optionRating === this.rating) {
+        option.style.backgroundColor = '#dbeafe';
+        option.style.borderColor = '#3b82f6';
+        option.style.transform = 'scale(1.05)';
+      } else {
+        option.style.backgroundColor = 'transparent';
+        option.style.borderColor = 'transparent';
+        option.style.transform = 'scale(1)';
+      }
     });
   }
 
   /**
-   * Highlight stars on hover
+   * Highlight emoji option on hover
    */
-  highlightStars(rating) {
-    const stars = this.widgetElement.querySelectorAll('.feedbackly-star');
-    stars.forEach((star) => {
-      const starRating = parseInt(star.dataset.rating);
-      star.style.color = starRating <= rating ? '#ffc107' : '#ddd';
+  highlightEmojiOption(rating) {
+    const emojiOptions = this.widgetElement.querySelectorAll('.feedbackly-emoji-option');
+    emojiOptions.forEach(option => {
+      const optionRating = parseInt(option.dataset.rating);
+      if (optionRating === rating) {
+        option.style.backgroundColor = '#f3f4f6';
+        option.style.transform = 'scale(1.05)';
+      } else {
+        option.style.backgroundColor = 'transparent';
+        option.style.transform = 'scale(1)';
+      }
     });
   }
 
   /**
-   * Reset star highlight
+   * Update submit button state
    */
-  resetStarHighlight() {
-    this.updateStarDisplay();
+  updateSubmitButton() {
+    const submitButton = this.widgetElement.querySelector('.feedbackly-submit');
+    if (submitButton) {
+      if (this.rating > 0) {
+        submitButton.style.opacity = '1';
+        submitButton.style.cursor = 'pointer';
+        submitButton.disabled = false;
+      } else {
+        submitButton.style.opacity = '0.5';
+        submitButton.style.cursor = 'not-allowed';
+        submitButton.disabled = true;
+      }
+    }
   }
 
   /**
@@ -497,7 +630,7 @@ class FeedbackWidget {
    */
   autoResizeTextarea() {
     this.feedbackTextarea.style.height = 'auto';
-    this.feedbackTextarea.style.height = this.feedbackTextarea.scrollHeight + 'px';
+    this.feedbackTextarea.style.height = `${this.feedbackTextarea.scrollHeight}px`;
   }
 
   /**
@@ -515,10 +648,9 @@ class FeedbackWidget {
       };
 
       await this.apiClient.submitFeedbackWithRetry(feedbackData);
-      
+
       this.showThankYouMessage();
       this.resetForm();
-      
     } catch (error) {
       console.error('Failed to submit feedback:', error);
       this.showErrorMessage();
@@ -591,10 +723,12 @@ class FeedbackWidget {
     this.widgetElement.style.display = 'block';
     this.triggerButton.style.display = 'none';
     this.isVisible = true;
-    
+
     // Focus on first input
     setTimeout(() => {
-      const firstInput = this.widgetElement.querySelector('input, textarea, select');
+      const firstInput = this.widgetElement.querySelector(
+        'input, textarea, select'
+      );
       if (firstInput) {
         firstInput.focus();
       }
@@ -636,16 +770,28 @@ class FeedbackWidget {
    * Destroy widget
    */
   destroy() {
+    // Remove event listeners first
+    if (this.eventListeners) {
+      removeEventListeners(document, this.eventListeners);
+      this.eventListeners = null;
+    }
+
+    // Remove DOM elements
     if (this.widgetElement) {
       this.widgetElement.remove();
+      this.widgetElement = null;
     }
     if (this.triggerButton) {
       this.triggerButton.remove();
+      this.triggerButton = null;
     }
-    // Only remove event listeners if they were properly attached
-    if (this.eventListeners) {
-      removeEventListeners(document, this.eventListeners);
-    }
+
+    // Reset state
+    this.isVisible = false;
+    this.isMinimized = false;
+    this.feedbackForm = null;
+    this.rating = 0;
+    this.feedbackText = '';
   }
 }
 
