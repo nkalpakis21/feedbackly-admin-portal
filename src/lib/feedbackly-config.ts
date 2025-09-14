@@ -12,21 +12,14 @@ export interface FeedbacklySourceConfig {
 
 // Environment configuration for SDK source
 const getFeedbacklySourceConfig = (): FeedbacklySourceConfig => {
-    // Check for environment variable first
-    const useLocalSDK = process.env.NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK === 'true';
-
-    // Check for URL parameter (for easy testing)
-    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-    const urlUseLocal = urlParams?.get('use-local-sdk') === 'true';
-
-    // Default to npm package in production, local in development
-    const defaultUseLocal = process.env.NODE_ENV === 'development';
-
-    return {
-        useLocalSDK: useLocalSDK || urlUseLocal || defaultUseLocal,
-        localSDKPath: process.env.NEXT_PUBLIC_LOCAL_FEEDBACKLY_PATH || '../feedbackly-sdk',
-        npmPackageVersion: process.env.NEXT_PUBLIC_FEEDBACKLY_VERSION || '^1.0.0'
-    };
+  // Only use environment variable for configuration
+  const useLocalSDK = process.env.NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK === 'true';
+  
+  return {
+    useLocalSDK,
+    localSDKPath: process.env.NEXT_PUBLIC_LOCAL_FEEDBACKLY_PATH || '../feedbackly-sdk',
+    npmPackageVersion: process.env.NEXT_PUBLIC_FEEDBACKLY_VERSION || '^1.0.0'
+  };
 };
 
 export const feedbacklySourceConfig = getFeedbacklySourceConfig();

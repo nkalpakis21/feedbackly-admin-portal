@@ -9,9 +9,9 @@ The admin portal now supports two modes for the Feedbackly SDK:
 1. **NPM Package Mode** (Default): Uses the published [feedbackly-sdk](https://www.npmjs.com/package/feedbackly-sdk) package
 2. **Local Development Mode**: Uses local SDK files for testing changes
 
-## 🔧 Configuration Methods
+## 🔧 Configuration Method
 
-### Method 1: Environment Variables (Recommended)
+### Environment Variables (Only Method)
 
 Create a `.env.local` file in the admin-portal directory:
 
@@ -22,40 +22,6 @@ NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=false
 # Use local development files
 NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=true
 ```
-
-### Method 2: URL Parameters (Quick Testing)
-
-Add URL parameters to switch modes without changing files:
-
-```bash
-# Use NPM package
-http://localhost:3000?use-local-sdk=false
-
-# Use local development
-http://localhost:3000?use-local-sdk=true
-```
-
-### Method 3: NPM Scripts
-
-Use the provided npm scripts for easy switching:
-
-```bash
-# Development with NPM package
-npm run dev:npm-sdk
-
-# Development with local SDK
-npm run dev:local-sdk
-
-# Build with NPM package
-npm run build:npm-sdk
-
-# Build with local SDK
-npm run build:local-sdk
-```
-
-### Method 4: Development Toggle (UI)
-
-In development mode, a toggle widget appears in the top-left corner allowing you to switch between sources with a single click.
 
 ## 📁 File Structure
 
@@ -71,8 +37,7 @@ admin-portal/
 │   │       ├── widget/
 │   │       └── utils/
 │   └── components/
-│       ├── FeedbacklyWidget.tsx      # Main widget component
-│       └── FeedbacklyDevToggle.tsx   # Development toggle UI
+│       └── FeedbacklyWidget.tsx      # Main widget component
 ├── package.json                      # NPM package dependency
 └── .env.local                        # Environment configuration
 ```
@@ -96,7 +61,9 @@ admin-portal/
 
 3. **Test the new version**:
    ```bash
-   npm run dev:npm-sdk
+   # Ensure NPM package mode is enabled
+   echo "NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=false" > .env.local
+   npm run dev
    ```
 
 ### Testing Local Changes
@@ -111,18 +78,10 @@ admin-portal/
 2. **Test changes in admin portal**:
    ```bash
    cd ../admin-portal
-   npm run dev:local-sdk
-   ```
-
-### Quick Toggle During Development
-
-1. **Start development server**:
-   ```bash
+   # Enable local SDK mode
+   echo "NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=true" > .env.local
    npm run dev
    ```
-
-2. **Use the development toggle** in the top-left corner to switch between sources
-3. **Reload the page** when prompted to apply changes
 
 ## 🔍 Debugging
 
@@ -156,15 +115,15 @@ The console will show which SDK source is being used:
 2. **Use local mode** only when testing SDK changes
 3. **Always test both modes** before deploying
 4. **Keep local SDK files in sync** with the npm package
-5. **Use the development toggle** for quick testing during development
+5. **Use environment variables** to control SDK source
 
 ## 🔄 Workflow for SDK Updates
 
 1. **Develop changes** in the feedbackly-sdk repository
-2. **Test locally** using `npm run dev:local-sdk`
+2. **Test locally** by setting `NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=true` in `.env.local`
 3. **Publish to NPM** when ready
 4. **Update admin portal** to use the new version
-5. **Test with NPM package** using `npm run dev:npm-sdk`
+5. **Test with NPM package** by setting `NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=false` in `.env.local`
 6. **Deploy** when everything works correctly
 
-This setup provides maximum flexibility for development while maintaining production stability.
+This setup provides a clean, environment-based approach for switching between SDK sources.
