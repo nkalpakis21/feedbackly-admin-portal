@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFeedbacklyContext } from '@/contexts/FeedbacklyContext';
-import Feedbackly from '@/lib/feedbackly/core/Feedbackly';
-import '@/lib/feedbackly/styles/main.css';
+import { feedbacklyLoader, FeedbacklyInstance } from '@/lib/feedbackly-loader';
+import { feedbacklyConfig } from '@/lib/feedbackly-config';
 
 interface FeedbacklyWidgetProps {
   apiKey: string;
@@ -58,8 +58,9 @@ export default function FeedbacklyWidget({
 }: FeedbacklyWidgetProps) {
   const { currentUser } = useAuth();
   const { setFeedbacklyInstance } = useFeedbacklyContext();
-  const feedbacklyRef = useRef<Feedbackly | null>(null);
+  const feedbacklyRef = useRef<FeedbacklyInstance | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Only initialize if user is logged in
@@ -76,7 +77,13 @@ export default function FeedbacklyWidget({
     // Initialize Feedbackly SDK
     const initializeFeedbackly = async () => {
       try {
-        const feedbackly = new Feedbackly({
+        setIsLoading(true);
+        
+        // Load the appropriate SDK (npm package or local)
+        const feedbackly = await feedbacklyLoader.loadSDK();
+        
+        // Initialize with configuration
+        feedbackly.init({
           apiKey,
           websiteId,
           theme: {
@@ -127,8 +134,7 @@ export default function FeedbacklyWidget({
           },
         });
 
-        // Initialize the SDK
-        feedbackly.init();
+        // Store the instance
         feedbacklyRef.current = feedbackly;
         setFeedbacklyInstance(feedbackly);
         setError(null);
@@ -162,6 +168,8 @@ export default function FeedbacklyWidget({
       } catch (err) {
         console.error('Failed to initialize Feedbackly:', err);
         setError(err instanceof Error ? err.message : 'Failed to initialize feedback widget');
+      } finally {
+        setIsLoading(false);
       }
     };
 

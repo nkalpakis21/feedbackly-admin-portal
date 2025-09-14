@@ -1,19 +1,19 @@
 'use client';
 
 import React, { createContext, useContext, useRef, ReactNode } from 'react';
-import Feedbackly from '@/lib/feedbackly/core/Feedbackly';
+import { FeedbacklyInstance } from '@/lib/feedbackly-loader';
 
 interface FeedbacklyContextType {
-  feedbacklyInstance: React.MutableRefObject<Feedbackly | null>;
-  setFeedbacklyInstance: (instance: Feedbackly | null) => void;
+  feedbacklyInstance: React.MutableRefObject<FeedbacklyInstance | null>;
+  setFeedbacklyInstance: (instance: FeedbacklyInstance | null) => void;
 }
 
 const FeedbacklyContext = createContext<FeedbacklyContextType | null>(null);
 
 export function FeedbacklyProvider({ children }: { children: ReactNode }) {
-  const feedbacklyInstance = useRef<Feedbackly | null>(null);
+  const feedbacklyInstance = useRef<FeedbacklyInstance | null>(null);
 
-  const setFeedbacklyInstance = (instance: Feedbackly | null) => {
+  const setFeedbacklyInstance = (instance: FeedbacklyInstance | null) => {
     feedbacklyInstance.current = instance;
   };
 
