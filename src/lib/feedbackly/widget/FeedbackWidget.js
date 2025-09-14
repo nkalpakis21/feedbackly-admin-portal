@@ -713,7 +713,8 @@ class FeedbackWidget {
     if (this.categorySelect) {
       this.categorySelect.value = '';
     }
-    this.updateStarDisplay();
+    this.updateEmojiDisplay();
+    this.updateSubmitButton();
   }
 
   /**
