@@ -14,9 +14,9 @@ const firebaseConfig = {
 // Initialize Firebase
 let app;
 if (getApps().length === 0) {
-  app = initializeApp(firebaseConfig);
+    app = initializeApp(firebaseConfig);
 } else {
-  app = getApps()[0];
+    app = getApps()[0];
 }
 
 export const db = getFirestore(app);

@@ -3,11 +3,11 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase-admin';
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { websiteId: string } }
+    request: NextRequest,
+    { params }: { params: Promise<{ websiteId: string }> }
 ) {
-  try {
-    const { websiteId } = params;
+    try {
+        const { websiteId } = await params;
     
     if (!websiteId) {
       return NextResponse.json(
