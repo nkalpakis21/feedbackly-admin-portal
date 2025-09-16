@@ -61,8 +61,7 @@ class ShiplyLoader {
 
     private async loadNpmSDK(): Promise<ShiplyInstance> {
         // Load from npm package
-        // TODO: Update to shiply-sdk once published
-        const Shiply = await import('feedbackly-sdk');
+        const Shiply = await import('shiply-sdk');
         this.instance = new (Shiply as any)();
         return this.instance!;
     }
