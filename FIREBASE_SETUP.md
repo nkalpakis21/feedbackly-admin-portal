@@ -32,16 +32,18 @@ This guide will help you set up Firebase for your Shiply admin portal and API ro
 Create a `.env.local` file in your project root with the following variables:
 
 ```env
-# Firebase Configuration (from Step 3)
-NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key_here
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+# Firebase Configuration for Shiply Project
+NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyB6ZjiWO5Bs89HIdV48DwaIDVf6ttF5qbE
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=shiply-674f2.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=shiply-674f2
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=shiply-674f2.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=974311488204
+NEXT_PUBLIC_FIREBASE_APP_ID=1:974311488204:web:738278db23be129b4a6069
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-78GVHRKNVM
 
-# Optional: API Secret for additional security
-API_SECRET_KEY=your_secret_key_here
+# Shiply API Configuration
+NEXT_PUBLIC_SHIPLY_API_KEY=your-api-key-here
+NEXT_PUBLIC_SHIPLY_API_URL=http://localhost:3000/api
 ```
 
 ## Step 5: Set Up Firestore Collections
