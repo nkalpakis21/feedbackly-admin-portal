@@ -46,10 +46,17 @@ if [ -z "$FEATURE_BRANCH" ] || [ -z "$COMMIT_MESSAGE" ]; then
     exit 1
 fi
 
+<<<<<<< HEAD
 # Determine the development branch (dev or develop)
 DEV_BRANCH="dev"
 if git show-ref --verify --quiet refs/heads/develop; then
     DEV_BRANCH="develop"
+=======
+# Determine the development branch (develop or dev)
+DEV_BRANCH="develop"
+if ! git show-ref --verify --quiet refs/heads/develop; then
+    DEV_BRANCH="dev"
+>>>>>>> develop
 fi
 
 print_status "Using development branch: $DEV_BRANCH"
