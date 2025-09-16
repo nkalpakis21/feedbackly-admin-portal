@@ -237,4 +237,4 @@ The app can be deployed to any platform that supports Next.js:
 
 ## License
 
-This project is part of the Shiply platform. All rights reserved.# Test workflow fix
+This project is part of the Shiply platform. All rights reserved.
