@@ -22,7 +22,7 @@ export default function Header() {
         <div className="flex justify-between items-center py-6">
           <div className="flex items-center">
             <h1 className="text-2xl font-bold text-gray-900">
-              Feedbackly Admin Portal
+              Shiply Admin Portal
             </h1>
           </div>
           <div className="flex items-center space-x-4">

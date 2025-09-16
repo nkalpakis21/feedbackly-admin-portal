@@ -1,12 +1,12 @@
 # Firebase Setup Guide
 
-This guide will help you set up Firebase for your Feedbackly admin portal and API routes.
+This guide will help you set up Firebase for your Shiply admin portal and API routes.
 
 ## Step 1: Create Firebase Project
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
 2. Click "Create a project" or "Add project"
-3. Enter project name: `feedbackly` (or your preferred name)
+3. Enter project name: `Shiply` (or your preferred name)
 4. Enable Google Analytics (optional but recommended)
 5. Click "Create project"
 
@@ -23,7 +23,7 @@ This guide will help you set up Firebase for your Feedbackly admin portal and AP
 1. In your Firebase project, go to "Project Settings" (gear icon)
 2. Scroll down to "Your apps" section
 3. Click "Add app" and select the web icon (`</>`)
-4. Enter app nickname: `feedbackly-admin-portal`
+4. Enter app nickname: `Shiply-admin-portal`
 5. Click "Register app"
 6. Copy the Firebase configuration object
 

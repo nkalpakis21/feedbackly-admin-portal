@@ -1,6 +1,6 @@
-# Feedbackly Admin Portal
+# Shiply Admin Portal
 
-A Next.js admin portal for managing the Feedbackly platform, built with TypeScript, Tailwind CSS, Firebase Authentication, and Firestore database.
+A Next.js admin portal for managing the Shiply platform, built with TypeScript, Tailwind CSS, Firebase Authentication, and Firestore database.
 
 ## Features
 
@@ -237,4 +237,4 @@ The app can be deployed to any platform that supports Next.js:
 
 ## License
 
-This project is part of the Feedbackly platform. All rights reserved.
+This project is part of the Shiply platform. All rights reserved.

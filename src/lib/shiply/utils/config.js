@@ -8,7 +8,7 @@
 const DEFAULT_CONFIG = {
   apiKey: '',
   websiteId: '',
-  apiUrl: 'https://api.feedbackly.com',
+  apiUrl: 'https://api.Shiply.com',
   timeout: 10000,
   
   // Widget appearance

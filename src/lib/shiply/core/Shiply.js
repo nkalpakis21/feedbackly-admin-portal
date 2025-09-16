@@ -1,12 +1,12 @@
-import FeedbackWidget from '../widget/FeedbackWidget';
+import ShipWidget from '../widget/ShipWidget';
 import ApiClient from '../api/ApiClient';
 import { validateConfig, mergeConfig } from '../utils/config';
 import { generateUserId, getSessionId } from '../utils/session';
 
 /**
- * Main Feedbackly SDK class
+ * Main Shiply SDK class
  */
-class Feedbackly {
+class Shiply {
   constructor(config = {}) {
     this.config = mergeConfig(config);
     this.widget = null;
@@ -17,7 +17,7 @@ class Feedbackly {
   }
 
   /**
-   * Initialize the Feedbackly SDK
+   * Initialize the Shiply SDK
    * @param {Object} config - Configuration object
    */
   init(config = {}) {
@@ -36,11 +36,11 @@ class Feedbackly {
       
       this.isInitialized = true;
       
-      console.log('Feedbackly SDK initialized successfully');
+      console.log('Shiply SDK initialized successfully');
       
       return this;
     } catch (error) {
-      console.error('Failed to initialize Feedbackly SDK:', error);
+      console.error('Failed to initialize Shiply SDK:', error);
       throw error;
     }
   }
@@ -50,7 +50,7 @@ class Feedbackly {
    */
   show() {
     if (!this.isInitialized) {
-      throw new Error('Feedbackly SDK not initialized. Call init() first.');
+      throw new Error('Shiply SDK not initialized. Call init() first.');
     }
     
     this.widget.show();
@@ -61,7 +61,7 @@ class Feedbackly {
    */
   hide() {
     if (!this.isInitialized) {
-      throw new Error('Feedbackly SDK not initialized. Call init() first.');
+      throw new Error('Shiply SDK not initialized. Call init() first.');
     }
     
     this.widget.hide();
@@ -72,7 +72,7 @@ class Feedbackly {
    */
   toggle() {
     if (!this.isInitialized) {
-      throw new Error('Feedbackly SDK not initialized. Call init() first.');
+      throw new Error('Shiply SDK not initialized. Call init() first.');
     }
     
     this.widget.toggle();
@@ -84,7 +84,7 @@ class Feedbackly {
    */
   setUser(userInfo) {
     if (!this.isInitialized) {
-      throw new Error('Feedbackly SDK not initialized. Call init() first.');
+      throw new Error('Shiply SDK not initialized. Call init() first.');
     }
     
     this.config.user = { ...this.config.user, ...userInfo };
@@ -98,7 +98,7 @@ class Feedbackly {
    */
   track(eventName, eventData = {}) {
     if (!this.isInitialized) {
-      throw new Error('Feedbackly SDK not initialized. Call init() first.');
+      throw new Error('Shiply SDK not initialized. Call init() first.');
     }
     
     this.apiClient.trackEvent(eventName, {
@@ -115,7 +115,7 @@ class Feedbackly {
    */
   submitFeedback(feedbackData) {
     if (!this.isInitialized) {
-      throw new Error('Feedbackly SDK not initialized. Call init() first.');
+      throw new Error('Shiply SDK not initialized. Call init() first.');
     }
     
     return this.apiClient.submitFeedback({
@@ -159,4 +159,4 @@ class Feedbackly {
   }
 }
 
-export default Feedbackly;
+export default Shiply;

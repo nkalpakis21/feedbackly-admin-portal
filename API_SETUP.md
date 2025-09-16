@@ -1,6 +1,6 @@
 # Vercel API Routes Setup
 
-This document describes the API routes that have been set up for the Feedbackly widget integration.
+This document describes the API routes that have been set up for the Shiply widget integration.
 
 ## API Endpoints
 

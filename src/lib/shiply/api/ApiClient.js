@@ -1,10 +1,10 @@
 /**
- * API Client for communicating with Feedbackly backend
+ * API Client for communicating with Shiply backend
  */
 class ApiClient {
   constructor(config) {
     this.config = config;
-    this.baseUrl = config.apiUrl || 'https://api.feedbackly.com';
+    this.baseUrl = config.apiUrl || 'https://api.Shiply.com';
     this.apiKey = config.apiKey;
     this.timeout = config.timeout || 10000;
   }

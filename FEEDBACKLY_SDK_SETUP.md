@@ -1,12 +1,12 @@
-# Feedbackly SDK Integration Setup
+# Shiply SDK Integration Setup
 
-This document explains how to switch between the production NPM package and local development version of the Feedbackly SDK.
+This document explains how to switch between the production NPM package and local development version of the Shiply SDK.
 
 ## 🎯 Overview
 
-The admin portal now supports two modes for the Feedbackly SDK:
+The admin portal now supports two modes for the Shiply SDK:
 
-1. **NPM Package Mode** (Default): Uses the published [feedbackly-sdk](https://www.npmjs.com/package/feedbackly-sdk) package
+1. **NPM Package Mode** (Default): Uses the published [Shiply-sdk](https://www.npmjs.com/package/Shiply-sdk) package
 2. **Local Development Mode**: Uses local SDK files for testing changes
 
 ## 🔧 Configuration Method
@@ -29,15 +29,15 @@ NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=true
 admin-portal/
 ├── src/
 │   ├── lib/
-│   │   ├── feedbackly-config.ts      # Environment-based configuration
-│   │   ├── feedbackly-loader.ts      # Dynamic SDK loader
-│   │   └── feedbackly/               # Local SDK files (when using local mode)
+│   │   ├── Shiply-config.ts      # Environment-based configuration
+│   │   ├── Shiply-loader.ts      # Dynamic SDK loader
+│   │   └── Shiply/               # Local SDK files (when using local mode)
 │   │       ├── core/
 │   │       ├── api/
 │   │       ├── widget/
 │   │       └── utils/
 │   └── components/
-│       └── FeedbacklyWidget.tsx      # Main widget component
+│       └── ShiplyWidget.tsx      # Main widget component
 ├── package.json                      # NPM package dependency
 └── .env.local                        # Environment configuration
 ```
@@ -48,7 +48,7 @@ admin-portal/
 
 1. **Publish new version to NPM**:
    ```bash
-   cd ../feedbackly-sdk
+   cd ../Shiply-sdk
    npm version patch
    npm publish
    ```
@@ -56,7 +56,7 @@ admin-portal/
 2. **Update admin portal to use new version**:
    ```bash
    cd ../admin-portal
-   npm update feedbackly-sdk
+   npm update Shiply-sdk
    ```
 
 3. **Test the new version**:
@@ -70,7 +70,7 @@ admin-portal/
 
 1. **Make changes to local SDK**:
    ```bash
-   cd ../feedbackly-sdk
+   cd ../Shiply-sdk
    # Make your changes
    npm run build
    ```
@@ -90,7 +90,7 @@ admin-portal/
 The console will show which SDK source is being used:
 
 ```
-🔧 Feedbackly SDK Configuration: {
+🔧 Shiply SDK Configuration: {
   useLocalSDK: false,
   source: 'NPM Package',
   version: '^1.0.0'
@@ -99,15 +99,15 @@ The console will show which SDK source is being used:
 
 ### Common Issues
 
-1. **SDK not loading**: Check that the npm package is installed (`npm list feedbackly-sdk`)
+1. **SDK not loading**: Check that the npm package is installed (`npm list Shiply-sdk`)
 2. **Local files not found**: Ensure the local SDK path is correct in configuration
 3. **Build errors**: Make sure both SDK versions are compatible with your Next.js setup
 
 ## 📦 NPM Package Information
 
-- **Package**: [feedbackly-sdk](https://www.npmjs.com/package/feedbackly-sdk)
+- **Package**: [Shiply-sdk](https://www.npmjs.com/package/Shiply-sdk)
 - **Current Version**: 1.0.0
-- **Repository**: [nkalpakis21/feedbackly-sdk](https://github.com/nkalpakis21/feedbackly-sdk)
+- **Repository**: [nkalpakis21/Shiply-sdk](https://github.com/nkalpakis21/Shiply-sdk)
 
 ## 🎯 Best Practices
 
@@ -119,7 +119,7 @@ The console will show which SDK source is being used:
 
 ## 🔄 Workflow for SDK Updates
 
-1. **Develop changes** in the feedbackly-sdk repository
+1. **Develop changes** in the Shiply-sdk repository
 2. **Test locally** by setting `NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=true` in `.env.local`
 3. **Publish to NPM** when ready
 4. **Update admin portal** to use the new version

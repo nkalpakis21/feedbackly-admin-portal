@@ -1,43 +1,43 @@
 /**
- * Feedbackly SDK Configuration for Admin Portal
+ * Shiply SDK Configuration for Admin Portal
  * Supports both NPM package and local development modes
  */
 
 // Environment-based SDK source configuration
-export interface FeedbacklySourceConfig {
+export interface ShiplySourceConfig {
     useLocalSDK: boolean;
     localSDKPath?: string;
     npmPackageVersion?: string;
 }
 
 // Environment configuration for SDK source
-const getFeedbacklySourceConfig = (): FeedbacklySourceConfig => {
+const getShiplySourceConfig = (): ShiplySourceConfig => {
     // Only use environment variable for configuration
-    const useLocalSDK = process.env.NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK === 'true';
+    const useLocalSDK = process.env.NEXT_PUBLIC_USE_LOCAL_SHIPLY_SDK === 'true';
 
     return {
         useLocalSDK,
-        localSDKPath: process.env.NEXT_PUBLIC_LOCAL_FEEDBACKLY_PATH || '../feedbackly-sdk',
-        npmPackageVersion: process.env.NEXT_PUBLIC_FEEDBACKLY_VERSION || '^1.0.0'
+        localSDKPath: process.env.NEXT_PUBLIC_LOCAL_SHIPLY_PATH || '../shiply-sdk',
+        npmPackageVersion: process.env.NEXT_PUBLIC_SHIPLY_VERSION || '^1.2.0'
     };
 };
 
-export const feedbacklySourceConfig = getFeedbacklySourceConfig();
+export const shiplySourceConfig = getShiplySourceConfig();
 
 // Log current configuration in development
 if (process.env.NODE_ENV === 'development') {
-    console.log('🔧 Feedbackly SDK Configuration:', {
-        useLocalSDK: feedbacklySourceConfig.useLocalSDK,
-        source: feedbacklySourceConfig.useLocalSDK ? 'Local Development' : 'NPM Package',
-        version: feedbacklySourceConfig.useLocalSDK ? 'Local' : feedbacklySourceConfig.npmPackageVersion
+    console.log('🔧 Shiply SDK Configuration:', {
+        useLocalSDK: shiplySourceConfig.useLocalSDK,
+        source: shiplySourceConfig.useLocalSDK ? 'Local Development' : 'NPM Package',
+        version: shiplySourceConfig.useLocalSDK ? 'Local' : shiplySourceConfig.npmPackageVersion
     });
 }
 
 // Widget Configuration
-export const FEEDBACKLY_CONFIG = {
+export const SHIPLY_CONFIG = {
     // API Configuration
-    apiKey: process.env.NEXT_PUBLIC_FEEDBACKLY_API_KEY || '',
-    websiteId: process.env.NEXT_PUBLIC_FEEDBACKLY_WEBSITE_ID || 'admin-portal',
+    apiKey: process.env.NEXT_PUBLIC_SHIPLY_API_KEY || '',
+    websiteId: process.env.NEXT_PUBLIC_SHIPLY_WEBSITE_ID || 'admin-portal',
 
     // Widget Theme - Admin Portal specific
     theme: {
@@ -95,7 +95,7 @@ export const FEEDBACKLY_CONFIG = {
     zIndex: 9999,
 };
 
-export const FEEDBACKLY_EVENTS = {
+export const SHIPLY_EVENTS = {
     ADMIN_PORTAL_OPENED: 'admin_portal_opened',
     DASHBOARD_VIEWED: 'dashboard_viewed',
     USERS_PAGE_VIEWED: 'users_page_viewed',
@@ -107,8 +107,8 @@ export const FEEDBACKLY_EVENTS = {
     FEEDBACK_BUTTON_CLICKED: 'feedback_button_clicked',
 } as const;
 
-export type FeedbacklyEvent = typeof FEEDBACKLY_EVENTS[keyof typeof FEEDBACKLY_EVENTS];
+export type ShiplyEvent = typeof SHIPLY_EVENTS[keyof typeof SHIPLY_EVENTS];
 
 // Export both configurations for backward compatibility
-export const feedbacklyConfig = feedbacklySourceConfig;
-export default feedbacklySourceConfig;
+export const shiplyConfig = shiplySourceConfig;
+export default shiplySourceConfig;

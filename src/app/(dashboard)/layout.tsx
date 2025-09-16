@@ -1,9 +1,9 @@
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
-import FeedbacklyWidget from '@/components/FeedbacklyWidget';
-import { FeedbacklyProvider } from '@/contexts/FeedbacklyContext';
-import { FEEDBACKLY_CONFIG } from '@/lib/feedbackly-config';
+import ShiplyWidget from '@/components/ShiplyWidget';
+import { ShiplyProvider } from '@/contexts/ShiplyContext';
+import { SHIPLY_CONFIG } from '@/lib/shiply-config';
 
 export default function DashboardLayout({
   children,
@@ -12,7 +12,7 @@ export default function DashboardLayout({
 }) {
   return (
     <ProtectedRoute>
-      <FeedbacklyProvider>
+      <ShiplyProvider>
         <div className="min-h-screen bg-gray-50">
           <Header />
           <div className="flex">
@@ -21,20 +21,20 @@ export default function DashboardLayout({
               {children}
             </main>
           </div>
-          {/* Feedbackly Widget - Only shows when user is logged in */}
-          <FeedbacklyWidget
-            apiKey={FEEDBACKLY_CONFIG.apiKey}
-            websiteId={FEEDBACKLY_CONFIG.websiteId}
-            theme={FEEDBACKLY_CONFIG.theme}
-            position={FEEDBACKLY_CONFIG.position}
-            size={FEEDBACKLY_CONFIG.size}
-            text={FEEDBACKLY_CONFIG.text}
-            categories={FEEDBACKLY_CONFIG.categories}
-            autoShow={FEEDBACKLY_CONFIG.autoShow}
-            autoShowDelay={FEEDBACKLY_CONFIG.autoShowDelay}
+          {/* Shiply Widget - Only shows when user is logged in */}
+          <ShiplyWidget
+            apiKey={SHIPLY_CONFIG.apiKey}
+            websiteId={SHIPLY_CONFIG.websiteId}
+            theme={SHIPLY_CONFIG.theme}
+            position={SHIPLY_CONFIG.position}
+            size={SHIPLY_CONFIG.size}
+            text={SHIPLY_CONFIG.text}
+            categories={SHIPLY_CONFIG.categories}
+            autoShow={SHIPLY_CONFIG.autoShow}
+            autoShowDelay={SHIPLY_CONFIG.autoShowDelay}
           />
         </div>
-      </FeedbacklyProvider>
+      </ShiplyProvider>
     </ProtectedRoute>
   );
 }

@@ -2,25 +2,25 @@
 
 import { useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useFeedbacklyContext } from '@/contexts/FeedbacklyContext';
-import { FEEDBACKLY_EVENTS, FeedbacklyEvent } from '@/lib/feedbackly-config';
+import { useShiplyContext } from '@/contexts/ShiplyContext';
+import { SHIPLY_EVENTS, ShiplyEvent } from '@/lib/shiply-config';
 
 /**
- * Custom hook for Feedbackly functionality
+ * Custom hook for Shiply functionality
  * Provides easy access to feedback tracking and widget control
  */
-export const useFeedbackly = () => {
+export const useShiply = () => {
     const { currentUser } = useAuth();
-    const { feedbacklyInstance } = useFeedbacklyContext();
+    const { ShiplyInstance } = useShiplyContext();
 
     /**
      * Track a custom event
      */
-    const trackEvent = useCallback((eventName: FeedbacklyEvent, eventData: Record<string, unknown> = {}) => {
-        if (!currentUser || !feedbacklyInstance.current) return;
+    const trackEvent = useCallback((eventName: ShiplyEvent, eventData: Record<string, unknown> = {}) => {
+        if (!currentUser || !ShiplyInstance.current) return;
 
         try {
-            feedbacklyInstance.current.track(eventName, {
+            ShiplyInstance.current.track(eventName, {
                 ...eventData,
                 userId: currentUser.uid,
                 email: currentUser.email,
@@ -29,47 +29,47 @@ export const useFeedbackly = () => {
         } catch (error) {
             console.warn('Failed to track event:', error);
         }
-    }, [currentUser, feedbacklyInstance]);
+    }, [currentUser, ShiplyInstance]);
 
     /**
      * Show the feedback widget
      */
     const showWidget = useCallback(() => {
-        if (!currentUser || !feedbacklyInstance.current) return;
+        if (!currentUser || !ShiplyInstance.current) return;
 
         try {
-            feedbacklyInstance.current.show();
+            ShiplyInstance.current.show();
         } catch (error) {
             console.warn('Failed to show widget:', error);
         }
-    }, [currentUser, feedbacklyInstance]);
+    }, [currentUser, ShiplyInstance]);
 
     /**
      * Hide the feedback widget
      */
     const hideWidget = useCallback(() => {
-        if (!currentUser || !feedbacklyInstance.current) return;
+        if (!currentUser || !ShiplyInstance.current) return;
 
         try {
-            feedbacklyInstance.current.hide();
+            ShiplyInstance.current.hide();
         } catch (error) {
             console.warn('Failed to hide widget:', error);
         }
-    }, [currentUser, feedbacklyInstance]);
+    }, [currentUser, ShiplyInstance]);
 
     /**
      * Toggle the feedback widget
      */
     const toggleWidget = useCallback(() => {
-        if (!currentUser || !feedbacklyInstance.current) return;
+        if (!currentUser || !ShiplyInstance.current) return;
 
         try {
             console.log('Toggling feedback widget');
-            feedbacklyInstance.current.toggle();
+            ShiplyInstance.current.toggle();
         } catch (error) {
             console.warn('Failed to toggle widget:', error);
         }
-    }, [currentUser, feedbacklyInstance]);
+    }, [currentUser, ShiplyInstance]);
 
     /**
      * Submit feedback programmatically
@@ -79,10 +79,10 @@ export const useFeedbackly = () => {
         text?: string;
         category?: string;
     }) => {
-        if (!currentUser || !feedbacklyInstance.current) return;
+        if (!currentUser || !ShiplyInstance.current) return;
 
         try {
-            return await feedbacklyInstance.current.submitFeedback({
+            return await ShiplyInstance.current.submitFeedback({
                 ...feedbackData,
                 userId: currentUser.uid,
                 email: currentUser.email,
@@ -91,13 +91,13 @@ export const useFeedbackly = () => {
         } catch (error) {
             console.warn('Failed to submit feedback:', error);
         }
-    }, [currentUser, feedbacklyInstance]);
+    }, [currentUser, ShiplyInstance]);
 
     /**
      * Track page views
      */
     const trackPageView = useCallback((page: string) => {
-        trackEvent(FEEDBACKLY_EVENTS.NAVIGATION, {
+        trackEvent(SHIPLY_EVENTS.NAVIGATION, {
             page,
             action: 'page_view',
         });
@@ -107,7 +107,7 @@ export const useFeedbackly = () => {
      * Track user actions
      */
     const trackUserAction = useCallback((action: string, details: Record<string, unknown> = {}) => {
-        trackEvent(FEEDBACKLY_EVENTS.USER_MANAGEMENT_ACTION, {
+        trackEvent(SHIPLY_EVENTS.USER_MANAGEMENT_ACTION, {
             action,
             ...details,
         });
@@ -117,7 +117,7 @@ export const useFeedbackly = () => {
      * Track feedback actions
      */
     const trackFeedbackAction = useCallback((action: string, details: Record<string, unknown> = {}) => {
-        trackEvent(FEEDBACKLY_EVENTS.FEEDBACK_ACTION, {
+        trackEvent(SHIPLY_EVENTS.FEEDBACK_ACTION, {
             action,
             ...details,
         });
@@ -127,7 +127,7 @@ export const useFeedbackly = () => {
      * Track errors
      */
     const trackError = useCallback((error: Error, context: Record<string, unknown> = {}) => {
-        trackEvent(FEEDBACKLY_EVENTS.ERROR_OCCURRED, {
+        trackEvent(SHIPLY_EVENTS.ERROR_OCCURRED, {
             error: error.message,
             stack: error.stack,
             ...context,
@@ -149,7 +149,7 @@ export const useFeedbackly = () => {
         trackError,
 
         // Status
-        isAvailable: !!currentUser && !!feedbacklyInstance.current,
+        isAvailable: !!currentUser && !!ShiplyInstance.current,
         currentUser,
     };
 };

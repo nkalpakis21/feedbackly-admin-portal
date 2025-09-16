@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useFeedbacklyContext } from '@/contexts/FeedbacklyContext';
-import { feedbacklyLoader, FeedbacklyInstance } from '@/lib/feedbackly-loader';
-import { feedbacklyConfig } from '@/lib/feedbackly-config';
+import { useShiplyContext } from '@/contexts/ShiplyContext';
+import { shiplyLoader, ShiplyInstance } from '@/lib/shiply-loader';
+import { ShiplyConfig } from '@/lib/shiply-config';
 
-interface FeedbacklyWidgetProps {
+interface ShiplyWidgetProps {
   apiKey: string;
   websiteId: string;
   theme?: {
@@ -45,7 +45,7 @@ interface FeedbacklyWidgetProps {
   autoShowDelay?: number;
 }
 
-export default function FeedbacklyWidget({
+export default function ShiplyWidget({
   apiKey,
   websiteId,
   theme = {},
@@ -55,10 +55,10 @@ export default function FeedbacklyWidget({
   categories = [],
   autoShow = false,
   autoShowDelay = 5000,
-}: FeedbacklyWidgetProps) {
+}: ShiplyWidgetProps) {
   const { currentUser } = useAuth();
-  const { setFeedbacklyInstance } = useFeedbacklyContext();
-  const feedbacklyRef = useRef<FeedbacklyInstance | null>(null);
+  const { setShiplyInstance } = useShiplyContext();
+  const ShiplyRef = useRef<ShiplyInstance | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -66,24 +66,24 @@ export default function FeedbacklyWidget({
     // Only initialize if user is logged in
     if (!currentUser) {
       // Clean up if user logs out
-      if (feedbacklyRef.current) {
-        feedbacklyRef.current.destroy();
-        feedbacklyRef.current = null;
-        setFeedbacklyInstance(null);
+      if (ShiplyRef.current) {
+        ShiplyRef.current.destroy();
+        ShiplyRef.current = null;
+        setShiplyInstance(null);
       }
       return;
     }
 
-    // Initialize Feedbackly SDK
-    const initializeFeedbackly = async () => {
+    // Initialize Shiply SDK
+    const initializeShiply = async () => {
       try {
         setIsLoading(true);
         
         // Load the appropriate SDK (npm package or local)
-        const feedbackly = await feedbacklyLoader.loadSDK();
+        const Shiply = await shiplyLoader.loadSDK();
         
         // Initialize with configuration
-        feedbackly.init({
+        Shiply.init({
           apiKey,
           websiteId,
           theme: {
@@ -135,12 +135,12 @@ export default function FeedbacklyWidget({
         });
 
         // Store the instance
-        feedbacklyRef.current = feedbackly;
-        setFeedbacklyInstance(feedbackly);
+        ShiplyRef.current = Shiply;
+        setShiplyInstance(Shiply);
         setError(null);
 
         // Set user information
-        feedbackly.setUser({
+        Shiply.setUser({
           id: currentUser.uid,
           email: currentUser.email || '',
           name: currentUser.displayName || '',
@@ -150,13 +150,13 @@ export default function FeedbacklyWidget({
         // Auto-show if enabled
         if (autoShow) {
           setTimeout(() => {
-            feedbackly.show();
+            Shiply.show();
           }, autoShowDelay);
         }
 
         // Track that user opened the admin portal
         try {
-          feedbackly.track('admin_portal_opened', {
+          Shiply.track('admin_portal_opened', {
             userId: currentUser.uid,
             email: currentUser.email,
             timestamp: new Date().toISOString(),
@@ -166,29 +166,29 @@ export default function FeedbacklyWidget({
         }
 
       } catch (err) {
-        console.error('Failed to initialize Feedbackly:', err);
+        console.error('Failed to initialize Shiply:', err);
         setError(err instanceof Error ? err.message : 'Failed to initialize feedback widget');
       } finally {
         setIsLoading(false);
       }
     };
 
-    initializeFeedbackly();
+    initializeShiply();
 
     // Cleanup function
     return () => {
-      if (feedbacklyRef.current) {
-        feedbacklyRef.current.destroy();
-        feedbacklyRef.current = null;
-        setFeedbacklyInstance(null);
+      if (ShiplyRef.current) {
+        ShiplyRef.current.destroy();
+        ShiplyRef.current = null;
+        setShiplyInstance(null);
       }
     };
-  }, [currentUser, apiKey, websiteId, theme, position, size, text, categories, autoShow, autoShowDelay, setFeedbacklyInstance]);
+  }, [currentUser, apiKey, websiteId, theme, position, size, text, categories, autoShow, autoShowDelay, setShiplyInstance]);
 
   // Update user info when currentUser changes
   useEffect(() => {
-    if (feedbacklyRef.current && currentUser) {
-      feedbacklyRef.current.setUser({
+    if (ShiplyRef.current && currentUser) {
+      ShiplyRef.current.setUser({
         id: currentUser.uid,
         email: currentUser.email || '',
         name: currentUser.displayName || '',
@@ -206,7 +206,7 @@ export default function FeedbacklyWidget({
   // But we can return a hidden div to satisfy React's requirements
   return (
     <div style={{ display: 'none' }}>
-      {/* Feedbackly widget is rendered by the SDK */}
+      {/* Shiply widget is rendered by the SDK */}
     </div>
   );
 }

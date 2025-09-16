@@ -1,9 +1,9 @@
-// Dynamic Feedbackly SDK loader
+// Dynamic Shiply SDK loader
 // Handles switching between npm package and local development
 
-import { feedbacklySourceConfig } from './feedbackly-config';
+import { shiplySourceConfig } from './shiply-config';
 
-export interface FeedbacklyInstance {
+export interface ShiplyInstance {
     init: (config?: any) => void;
     show: () => void;
     hide: () => void;
@@ -14,12 +14,12 @@ export interface FeedbacklyInstance {
     destroy: () => void;
 }
 
-class FeedbacklyLoader {
-    private instance: FeedbacklyInstance | null = null;
+class ShiplyLoader {
+    private instance: ShiplyInstance | null = null;
     private isLoading = false;
-    private loadPromise: Promise<FeedbacklyInstance> | null = null;
+    private loadPromise: Promise<ShiplyInstance> | null = null;
 
-    async loadSDK(): Promise<FeedbacklyInstance> {
+    async loadSDK(): Promise<ShiplyInstance> {
         if (this.instance) {
             return this.instance;
         }
@@ -32,41 +32,42 @@ class FeedbacklyLoader {
         return this.loadPromise;
     }
 
-    private async loadSDKInternal(): Promise<FeedbacklyInstance> {
+    private async loadSDKInternal(): Promise<ShiplyInstance> {
         try {
             this.isLoading = true;
 
-            if (feedbacklySourceConfig.useLocalSDK) {
-                console.log('🔧 Loading Feedbackly SDK from local development...');
+            if (ShiplySourceConfig.useLocalSDK) {
+                console.log('🔧 Loading Shiply SDK from local development...');
                 return await this.loadLocalSDK();
             } else {
-                console.log('📦 Loading Feedbackly SDK from NPM package...');
+                console.log('📦 Loading Shiply SDK from NPM package...');
                 return await this.loadNpmSDK();
             }
         } catch (error) {
-            console.error('❌ Failed to load Feedbackly SDK:', error);
+            console.error('❌ Failed to load Shiply SDK:', error);
             throw error;
         } finally {
             this.isLoading = false;
         }
     }
 
-    private async loadLocalSDK(): Promise<FeedbacklyInstance> {
+    private async loadLocalSDK(): Promise<ShiplyInstance> {
         // For local development, we'll use the existing local files
         // This assumes the local SDK files are already in the project
-        const { default: Feedbackly } = await import('../lib/feedbackly/core/Feedbackly');
-        this.instance = new (Feedbackly as any)();
+        const { default: Shiply } = await import('../lib/Shiply/core/Shiply');
+        this.instance = new (Shiply as any)();
         return this.instance!;
     }
 
-    private async loadNpmSDK(): Promise<FeedbacklyInstance> {
+    private async loadNpmSDK(): Promise<ShiplyInstance> {
         // Load from npm package
-        const Feedbackly = await import('feedbackly-sdk');
-        this.instance = new (Feedbackly as any)();
+        // TODO: Update to shiply-sdk once published
+        const Shiply = await import('feedbackly-sdk');
+        this.instance = new (Shiply as any)();
         return this.instance!;
     }
 
-    getInstance(): FeedbacklyInstance | null {
+    getInstance(): ShiplyInstance | null {
         return this.instance;
     }
 
@@ -88,5 +89,5 @@ class FeedbacklyLoader {
 }
 
 // Export singleton instance
-export const feedbacklyLoader = new FeedbacklyLoader();
-export default feedbacklyLoader;
+export const shiplyLoader = new ShiplyLoader();
+export default shiplyLoader;

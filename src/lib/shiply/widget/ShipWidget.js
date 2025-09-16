@@ -5,9 +5,9 @@ import {
 } from '../utils/dom';
 
 /**
- * Feedback Widget Component
+ * Ship Widget Component
  */
-class FeedbackWidget {
+class ShipWidget {
   constructor(config, apiClient) {
     this.config = config;
     this.apiClient = apiClient;
@@ -38,8 +38,8 @@ class FeedbackWidget {
    */
   createWidget() {
     this.widgetElement = createElement('div', {
-      id: 'feedbackly-widget',
-      className: 'feedbackly-widget',
+      id: 'Shiply-widget',
+      className: 'Shiply-widget',
       style: {
         position: 'fixed',
         bottom: this.config.position?.bottom || '20px',
@@ -73,7 +73,7 @@ class FeedbackWidget {
    */
   createWidgetHeader() {
     const header = createElement('div', {
-      className: 'feedbackly-header',
+      className: 'Shiply-header',
       style: {
         padding: '24px 24px 16px 24px',
         display: 'flex',
@@ -93,7 +93,7 @@ class FeedbackWidget {
     });
 
     const closeButton = createElement('button', {
-      className: 'feedbackly-close',
+      className: 'Shiply-close',
       innerHTML: '×',
       style: {
         background: 'none',
@@ -137,7 +137,7 @@ class FeedbackWidget {
    */
   createFeedbackForm() {
     const formContainer = createElement('div', {
-      className: 'feedbackly-form-container',
+      className: 'Shiply-form-container',
       style: {
         padding: '0 24px',
         flex: 1,
@@ -167,7 +167,7 @@ class FeedbackWidget {
    */
   createRatingSection() {
     const ratingContainer = createElement('div', {
-      className: 'feedbackly-rating',
+      className: 'Shiply-rating',
       style: {
         marginBottom: '20px',
       },
@@ -185,7 +185,7 @@ class FeedbackWidget {
     });
 
     const emojiContainer = createElement('div', {
-      className: 'feedbackly-emoji-rating',
+      className: 'Shiply-emoji-rating',
       style: {
         display: 'flex',
         gap: '8px',
@@ -202,7 +202,7 @@ class FeedbackWidget {
 
     ratingOptions.forEach((option) => {
       const emojiButton = createElement('button', {
-        className: 'feedbackly-emoji-option',
+        className: 'Shiply-emoji-option',
         'data-rating': option.value,
         style: {
           display: 'flex',
@@ -259,7 +259,7 @@ class FeedbackWidget {
    */
   createTextSection() {
     const textContainer = createElement('div', {
-      className: 'feedbackly-text',
+      className: 'Shiply-text',
       style: {
         marginBottom: '20px',
       },
@@ -277,7 +277,7 @@ class FeedbackWidget {
     });
 
     this.feedbackTextarea = createElement('textarea', {
-      className: 'feedbackly-textarea',
+      className: 'Shiply-textarea',
       placeholder: 'Share your thoughts...',
       style: {
         width: '100%',
@@ -321,7 +321,7 @@ class FeedbackWidget {
    */
   createCategorySection() {
     const categoryContainer = createElement('div', {
-      className: 'feedbackly-category',
+      className: 'Shiply-category',
       style: {
         marginBottom: '20px',
       },
@@ -339,7 +339,7 @@ class FeedbackWidget {
     });
 
     this.categorySelect = createElement('select', {
-      className: 'feedbackly-select',
+      className: 'Shiply-select',
       style: {
         width: '100%',
         padding: '12px',
@@ -392,7 +392,7 @@ class FeedbackWidget {
    */
   createWidgetFooter() {
     const footer = createElement('div', {
-      className: 'feedbackly-footer',
+      className: 'Shiply-footer',
       style: {
         padding: '24px 24px 24px 24px',
         display: 'flex',
@@ -402,7 +402,7 @@ class FeedbackWidget {
     });
 
     const cancelButton = createElement('button', {
-      className: 'feedbackly-cancel',
+      className: 'Shiply-cancel',
       textContent: 'Cancel',
       style: {
         flex: '1',
@@ -420,7 +420,7 @@ class FeedbackWidget {
     });
 
     const submitButton = createElement('button', {
-      className: 'feedbackly-submit',
+      className: 'Shiply-submit',
       textContent: 'Submit',
       disabled: true,
       style: {
@@ -482,8 +482,8 @@ class FeedbackWidget {
    */
   createTriggerButton() {
     this.triggerButton = createElement('button', {
-      id: 'feedbackly-trigger',
-      className: 'feedbackly-trigger',
+      id: 'Shiply-trigger',
+      className: 'Shiply-trigger',
       innerHTML: this.config.trigger?.icon || '💬',
       style: {
         position: 'fixed',
@@ -575,7 +575,7 @@ class FeedbackWidget {
    * Update emoji display
    */
   updateEmojiDisplay() {
-    const emojiOptions = this.widgetElement.querySelectorAll('.feedbackly-emoji-option');
+    const emojiOptions = this.widgetElement.querySelectorAll('.Shiply-emoji-option');
     emojiOptions.forEach(option => {
       const optionRating = parseInt(option.dataset.rating);
       if (optionRating === this.rating) {
@@ -594,7 +594,7 @@ class FeedbackWidget {
    * Highlight emoji option on hover
    */
   highlightEmojiOption(rating) {
-    const emojiOptions = this.widgetElement.querySelectorAll('.feedbackly-emoji-option');
+    const emojiOptions = this.widgetElement.querySelectorAll('.Shiply-emoji-option');
     emojiOptions.forEach(option => {
       const optionRating = parseInt(option.dataset.rating);
       if (optionRating === rating) {
@@ -611,7 +611,7 @@ class FeedbackWidget {
    * Update submit button state
    */
   updateSubmitButton() {
-    const submitButton = this.widgetElement.querySelector('.feedbackly-submit');
+    const submitButton = this.widgetElement.querySelector('.Shiply-submit');
     if (submitButton) {
       if (this.rating > 0) {
         submitButton.style.opacity = '1';
@@ -662,7 +662,7 @@ class FeedbackWidget {
    */
   showThankYouMessage() {
     const message = createElement('div', {
-      className: 'feedbackly-message',
+      className: 'Shiply-message',
       innerHTML: `
         <div style="text-align: center; padding: 20px;">
           <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
@@ -685,7 +685,7 @@ class FeedbackWidget {
    */
   showErrorMessage() {
     const message = createElement('div', {
-      className: 'feedbackly-message',
+      className: 'Shiply-message',
       innerHTML: `
         <div style="text-align: center; padding: 20px;">
           <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
@@ -796,4 +796,4 @@ class FeedbackWidget {
   }
 }
 
-export default FeedbackWidget;
+export default ShipWidget;

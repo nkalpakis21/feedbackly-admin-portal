@@ -36,7 +36,7 @@ export default function TestFirebasePage() {
     setResult('Fetching all websites...');
     
     const response = await getAllWebsites();
-    if (response.success) {
+    if (response.success && response.websites) {
       setResult(`✅ Found ${response.websites.length} websites: ${response.websites.map(w => w.id).join(', ')}`);
     } else {
       setResult(`❌ Error: ${response.error}`);

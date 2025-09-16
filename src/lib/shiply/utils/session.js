@@ -3,9 +3,9 @@
  */
 
 const STORAGE_KEYS = {
-  USER_ID: 'feedbackly_user_id',
-  SESSION_ID: 'feedbackly_session_id',
-  SESSION_START: 'feedbackly_session_start',
+  USER_ID: 'Shiply_user_id',
+  SESSION_ID: 'Shiply_session_id',
+  SESSION_START: 'Shiply_session_start',
 };
 
 /**
@@ -56,7 +56,7 @@ export function clearSession() {
 }
 
 /**
- * Clear all Feedbackly data
+ * Clear all Shiply data
  */
 export function clearAllData() {
   localStorage.removeItem(STORAGE_KEYS.USER_ID);

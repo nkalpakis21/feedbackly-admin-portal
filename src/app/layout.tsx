@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Feedbackly Admin Portal",
-  description: "Admin portal for managing Feedbackly platform",
+  title: "Shiply Admin Portal",
+  description: "Admin portal for managing Shiply platform",
 };
 
 export default function RootLayout({

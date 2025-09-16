@@ -1,30 +1,30 @@
-'use client';
+&apos;use client&apos;;
 
-import { useState } from 'react';
+import { useState } from &apos;react&apos;;
 
 export default function TestApiPage() {
-  const [result, setResult] = useState<string>('');
+  const [result, setResult] = useState<string>(&apos;&apos;);
   const [loading, setLoading] = useState(false);
 
   const testFeedbackApi = async () => {
     setLoading(true);
-    setResult('Testing feedback API...');
+    setResult(&apos;Testing feedback API...&apos;);
     
     try {
-      const response = await fetch('/api/feedback', {
-        method: 'POST',
+      const response = await fetch(&apos;/api/feedback&apos;, {
+        method: &apos;POST&apos;,
         headers: {
-          'Content-Type': 'application/json',
+          &apos;Content-Type&apos;: &apos;application/json&apos;,
         },
         body: JSON.stringify({
-          websiteId: 'admin-portal',
-          apiKey: 'your-api-key-here',
+          websiteId: &apos;admin-portal&apos;,
+          apiKey: &apos;your-api-key-here&apos;,
           rating: 5,
-          feedback: 'This is a test feedback from the API test page',
-          category: 'general',
+          feedback: &apos;This is a test feedback from the API test page&apos;,
+          category: &apos;general&apos;,
           userInfo: {
-            email: 'test@example.com',
-            name: 'Test User'
+            email: &apos;test@example.com&apos;,
+            name: &apos;Test User&apos;
           }
         }),
       });
@@ -39,25 +39,25 @@ export default function TestApiPage() {
 
   const testEventsApi = async () => {
     setLoading(true);
-    setResult('Testing events API...');
+    setResult(&apos;Testing events API...&apos;);
     
     try {
-      const response = await fetch('/api/events', {
-        method: 'POST',
+      const response = await fetch(&apos;/api/events&apos;, {
+        method: &apos;POST&apos;,
         headers: {
-          'Content-Type': 'application/json',
+          &apos;Content-Type&apos;: &apos;application/json&apos;,
         },
         body: JSON.stringify({
-          websiteId: 'admin-portal',
-          apiKey: 'your-api-key-here',
-          eventName: 'test_event',
+          websiteId: &apos;admin-portal&apos;,
+          apiKey: &apos;your-api-key-here&apos;,
+          eventName: &apos;test_event&apos;,
           eventData: {
-            page: 'test-api',
-            action: 'button_click'
+            page: &apos;test-api&apos;,
+            action: &apos;button_click&apos;
           },
           userInfo: {
-            email: 'test@example.com',
-            name: 'Test User'
+            email: &apos;test@example.com&apos;,
+            name: &apos;Test User&apos;
           }
         }),
       });
@@ -72,10 +72,10 @@ export default function TestApiPage() {
 
   const testWidgetConfigApi = async () => {
     setLoading(true);
-    setResult('Testing widget config API...');
+    setResult(&apos;Testing widget config API...&apos;);
     
     try {
-      const response = await fetch('/api/widget/config/admin-portal');
+      const response = await fetch(&apos;/api/widget/config/admin-portal&apos;);
       const data = await response.json();
       setResult(`✅ Widget Config API Response: ${JSON.stringify(data, null, 2)}`);
     } catch (error) {
@@ -131,7 +131,7 @@ export default function TestApiPage() {
           <p><strong>Instructions:</strong></p>
           <ol className="list-decimal list-inside space-y-1 mt-2">
             <li>Make sure your development server is running</li>
-            <li>Test each API endpoint to verify they're working</li>
+            <li>Test each API endpoint to verify they&apos;re working</li>
             <li>Check the browser console for any errors</li>
             <li>Verify data is being saved to Firestore</li>
           </ol>

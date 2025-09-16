@@ -3,15 +3,15 @@
 import { useEffect } from 'react';
 import DashboardStats from '@/components/DashboardStats';
 import RecentFeedback from '@/components/RecentFeedback';
-import { useFeedbackly } from '@/hooks/useFeedbackly';
-import { FEEDBACKLY_EVENTS } from '@/lib/feedbackly-config';
+import { useShiply } from '@/hooks/useShiply';
+import { SHIPLY_EVENTS } from '@/lib/shiply-config';
 
 export default function DashboardPage() {
-  const { trackEvent } = useFeedbackly();
+  const { trackEvent } = useShiply();
 
   useEffect(() => {
     // Track dashboard page view
-    trackEvent(FEEDBACKLY_EVENTS.DASHBOARD_VIEWED, {
+    trackEvent(SHIPLY_EVENTS.DASHBOARD_VIEWED, {
       page: 'dashboard',
       timestamp: new Date().toISOString(),
     });
@@ -22,7 +22,7 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Overview of your Feedbackly platform
+          Overview of your Shiply platform
         </p>
       </div>
 

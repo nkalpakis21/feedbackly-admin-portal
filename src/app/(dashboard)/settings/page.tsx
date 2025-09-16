@@ -22,7 +22,7 @@ export default function SettingsPage() {
                 type="text"
                 id="platform-name"
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Feedbackly"
+                placeholder="Shiply"
               />
             </div>
             

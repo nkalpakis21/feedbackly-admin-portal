@@ -1,10 +1,10 @@
-import Feedbackly from './core/Feedbackly';
+import Shiply from './core/Shiply';
 import './styles/main.css';
 
 // Export the main class
-export default Feedbackly;
+export default Shiply;
 
 // Also make it available globally when loaded via script tag
 if (typeof window !== 'undefined') {
-  window.Feedbackly = Feedbackly;
+  window.Shiply = Shiply;
 }
