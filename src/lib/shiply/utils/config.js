@@ -8,7 +8,7 @@
 const DEFAULT_CONFIG = {
   apiKey: '',
   websiteId: '',
-  apiUrl: 'https://api.Shiply.com',
+  apiUrl: 'https://www.shiplyai.com',
   timeout: 10000,
   
   // Widget appearance
