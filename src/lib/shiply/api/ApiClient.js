@@ -4,7 +4,7 @@
 class ApiClient {
   constructor(config) {
     this.config = config;
-    this.baseUrl = config.apiUrl || 'https://api.Shiply.com';
+    this.baseUrl = config.apiUrl || 'https://www.shiplyai.com';
     this.apiKey = config.apiKey;
     this.timeout = config.timeout || 10000;
   }
@@ -15,21 +15,16 @@ class ApiClient {
    */
   async submitFeedback(feedbackData) {
     try {
-      // TODO: Uncomment when API server is ready
-      // In development mode, simulate successful submission
-      console.log('Development mode: Simulating feedback submission', feedbackData);
-      return { success: true, message: 'Feedback submitted successfully (development mode)' };
+      const response = await this.makeRequest('/api/feedback', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...feedbackData,
+          websiteId: this.config.websiteId,
+          apiKey: this.apiKey,
+        }),
+      });
 
-      // const response = await this.makeRequest('/api/feedback', {
-      //   method: 'POST',
-      //   body: JSON.stringify({
-      //     ...feedbackData,
-      //     websiteId: this.config.websiteId,
-      //     apiKey: this.apiKey,
-      //   }),
-      // });
-
-      // return response;
+      return response;
     } catch (error) {
       console.error('Failed to submit feedback:', error);
       throw error;
@@ -43,22 +38,17 @@ class ApiClient {
    */
   async trackEvent(eventName, eventData) {
     try {
-      // TODO: Uncomment when API server is ready
-      // In development mode, just log the event
-      console.log('Development mode: Event tracked', { eventName, eventData });
-      return;
+      const response = await this.makeRequest('/api/events', {
+        method: 'POST',
+        body: JSON.stringify({
+          eventName,
+          eventData,
+          websiteId: this.config.websiteId,
+          apiKey: this.apiKey,
+        }),
+      });
 
-      // const response = await this.makeRequest('/api/events', {
-      //   method: 'POST',
-      //   body: JSON.stringify({
-      //     eventName,
-      //     eventData,
-      //     websiteId: this.config.websiteId,
-      //     apiKey: this.apiKey,
-      //   }),
-      // });
-
-      // return response;
+      return response;
     } catch (error) {
       console.error('Failed to track event:', error);
       // Don't throw for tracking events to avoid breaking user experience
@@ -70,16 +60,11 @@ class ApiClient {
    */
   async getWidgetConfig() {
     try {
-      // TODO: Uncomment when API server is ready
-      // Skip API call in development mode
-      console.log('Skipping widget config API call in development mode');
-      return null;
+      const response = await this.makeRequest(`/api/widget/config/${this.config.websiteId}`, {
+        method: 'GET',
+      });
 
-      // const response = await this.makeRequest(`/api/widget/config/${this.config.websiteId}`, {
-      //   method: 'GET',
-      // });
-
-      // return response;
+      return response;
     } catch (error) {
       console.error('Failed to get widget config:', error);
       return null;

@@ -18,7 +18,7 @@ const getShiplySourceConfig = (): ShiplySourceConfig => {
     return {
         useLocalSDK,
         localSDKPath: process.env.NEXT_PUBLIC_LOCAL_SHIPLY_PATH || '../shiply-sdk',
-        npmPackageVersion: process.env.NEXT_PUBLIC_SHIPLY_VERSION || '^1.2.0'
+        npmPackageVersion: process.env.NEXT_PUBLIC_SHIPLY_VERSION || '^1.2.3'
     };
 };
 
