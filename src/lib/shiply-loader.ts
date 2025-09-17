@@ -55,14 +55,15 @@ class ShiplyLoader {
         // For local development, we'll use the existing local files
         // This assumes the local SDK files are already in the project
         const { default: Shiply } = await import('./shiply/core/Shiply');
-        this.instance = new (Shiply as new () => ShiplyInstance)();
+        this.instance = new Shiply() as ShiplyInstance;
         return this.instance!;
     }
 
     private async loadNpmSDK(): Promise<ShiplyInstance> {
         // Load from npm package
-        const Shiply = await import('shiply-sdk');
-        this.instance = new (Shiply as new () => ShiplyInstance)();
+        const ShiplyModule = await import('shiply-sdk');
+        const Shiply = (ShiplyModule as Record<string, unknown>).Shiply || (ShiplyModule as Record<string, unknown>).default;
+        this.instance = new (Shiply as new () => ShiplyInstance)() as ShiplyInstance;
         return this.instance!;
     }
 
