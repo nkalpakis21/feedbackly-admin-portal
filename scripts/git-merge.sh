@@ -78,21 +78,13 @@ git push origin $DEV_BRANCH
 
 print_success "Successfully merged $FEATURE_BRANCH into $DEV_BRANCH!"
 
-# Step 3: Merge into main
-print_status "Merging $DEV_BRANCH into main..."
-git checkout main
-git pull origin main
-git merge $DEV_BRANCH
-git push origin main
-
-print_success "Successfully merged $DEV_BRANCH into main!"
-
-# Step 4: Clean up feature branch
+# Step 3: Clean up feature branch
 print_status "Cleaning up feature branch..."
 git branch -d $FEATURE_BRANCH
 git push origin --delete $FEATURE_BRANCH
 
 print_success "Feature branch '$FEATURE_BRANCH' has been deleted!"
 
-print_success "🎉 Complete workflow finished successfully!"
-print_status "Changes are now in both $DEV_BRANCH and main branches"
+print_success "🎉 Workflow finished successfully!"
+print_status "Changes are now in $DEV_BRANCH branch"
+print_warning "Remember to manually merge $DEV_BRANCH into main when ready"
