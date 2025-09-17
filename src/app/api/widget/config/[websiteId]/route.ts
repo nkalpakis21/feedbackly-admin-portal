@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase-admin';
+import { addCorsHeaders, handleCorsPreflight } from '@/lib/cors';
+
+// Handle CORS preflight requests
+export async function OPTIONS() {
+  return handleCorsPreflight();
+}
 
 export async function GET(
     request: NextRequest,
@@ -8,22 +14,25 @@ export async function GET(
 ) {
     try {
         const { websiteId } = await params;
+        const origin = request.headers.get('origin');
     
     if (!websiteId) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Website ID is required' },
         { status: 400 }
       );
+      return addCorsHeaders(response, origin);
     }
 
     // Get website configuration from Firestore
     const websiteDoc = await getDoc(doc(db, 'websites', websiteId));
     
     if (!websiteDoc.exists()) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Website not found' },
         { status: 404 }
       );
+      return addCorsHeaders(response, origin);
     }
 
     const websiteData = websiteDoc.data();
@@ -72,13 +81,15 @@ export async function GET(
       user: websiteData.user || {},
     };
 
-    return NextResponse.json(widgetConfig);
+    const response = NextResponse.json(widgetConfig);
+    return addCorsHeaders(response, origin);
 
   } catch (error) {
     console.error('Error getting widget config:', error);
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
+    return addCorsHeaders(response, request.headers.get('origin'));
   }
 }
