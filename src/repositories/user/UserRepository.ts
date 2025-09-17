@@ -117,7 +117,7 @@ export class UserRepository extends BaseRepository<UserDocument> {
             const userDoc = await this.getByUid(uid);
             if (userDoc) {
                 await this.update(userDoc.id, {
-                    lastLoginAt: Timestamp.now(),
+                    lastLogin: Timestamp.now(),
                 });
             }
         } catch (error) {

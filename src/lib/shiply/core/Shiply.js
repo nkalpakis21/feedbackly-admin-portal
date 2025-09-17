@@ -32,7 +32,7 @@ class Shiply {
       this.apiClient = new ApiClient(this.config);
       
       // Create feedback widget
-      this.widget = new FeedbackWidget(this.config, this.apiClient);
+      this.widget = new ShipWidget(this.config, this.apiClient);
       
       this.isInitialized = true;
       

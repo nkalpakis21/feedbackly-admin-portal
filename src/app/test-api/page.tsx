@@ -131,7 +131,7 @@ export default function TestApiPage() {
           <p><strong>Instructions:</strong></p>
           <ol className="list-decimal list-inside space-y-1 mt-2">
             <li>Make sure your development server is running</li>
-            <li>Test each API endpoint to verify they're working</li>
+            <li>Test each API endpoint to verify they&apos;re working</li>
             <li>Check the browser console for any errors</li>
             <li>Verify data is being saved to Firestore</li>
           </ol>

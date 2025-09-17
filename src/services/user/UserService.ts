@@ -22,22 +22,20 @@ export class UserService {
             // Validate input data
             this.validateCreateUserRequest(userData);
 
-            // Check if user already exists
-            const existingUser = await this.userRepository.getByUid(userData.uid);
-            if (existingUser) {
-                throw new Error('User already exists');
+            // Check if user already exists (only if uid is provided)
+            if (userData.uid) {
+                const existingUser = await this.userRepository.getByUid(userData.uid);
+                if (existingUser) {
+                    throw new Error('User already exists');
+                }
             }
 
             // Create user document
             const userDocument = await this.userRepository.create({
-                uid: userData.uid,
                 email: userData.email,
-                displayName: userData.displayName || undefined,
-                photoURL: userData.photoURL || undefined,
-                lastLoginAt: new Date() as unknown as Timestamp, // Will be converted to Timestamp in repository
+                name: userData.displayName || userData.name,
+                website: userData.website,
                 isActive: true,
-                provider: userData.provider,
-                role: 'user', // Default role
             });
 
             return userDocument;
@@ -214,6 +212,11 @@ export class UserService {
      */
     async createOrUpdateUser(userData: CreateUserRequest): Promise<UserDocument> {
         try {
+            if (!userData.uid) {
+                // If no uid, just create a new user
+                return await this.createUser(userData);
+            }
+
             const existingUser = await this.userRepository.getByUid(userData.uid);
 
             if (existingUser) {
@@ -235,11 +238,12 @@ export class UserService {
      */
     formatUserProfile(userDoc: UserDocument): UserProfile {
         return {
-            uid: userDoc.uid,
+            id: userDoc.id,
             email: userDoc.email,
-            displayName: userDoc.displayName,
-            photoURL: userDoc.photoURL,
-            role: userDoc.role,
+            name: userDoc.name,
+            website: userDoc.website,
+            createdAt: userDoc.createdAt.toDate(),
+            lastLogin: userDoc.lastLogin?.toDate(),
             isActive: userDoc.isActive,
         };
     }

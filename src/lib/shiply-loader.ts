@@ -4,13 +4,13 @@
 import { shiplySourceConfig } from './shiply-config';
 
 export interface ShiplyInstance {
-    init: (config?: any) => void;
+    init: (config?: Record<string, unknown>) => void;
     show: () => void;
     hide: () => void;
     toggle: () => void;
-    setUser: (user: any) => void;
-    track: (event: string, data?: any) => void;
-    submitFeedback: (feedbackData: any) => Promise<any>;
+    setUser: (user: Record<string, unknown>) => void;
+    track: (event: string, data?: Record<string, unknown>) => void;
+    submitFeedback: (feedbackData: Record<string, unknown>) => Promise<Record<string, unknown>>;
     destroy: () => void;
 }
 
@@ -36,7 +36,7 @@ class ShiplyLoader {
         try {
             this.isLoading = true;
 
-            if (ShiplySourceConfig.useLocalSDK) {
+            if (shiplySourceConfig.useLocalSDK) {
                 console.log('🔧 Loading Shiply SDK from local development...');
                 return await this.loadLocalSDK();
             } else {
@@ -54,15 +54,15 @@ class ShiplyLoader {
     private async loadLocalSDK(): Promise<ShiplyInstance> {
         // For local development, we'll use the existing local files
         // This assumes the local SDK files are already in the project
-        const { default: Shiply } = await import('../lib/Shiply/core/Shiply');
-        this.instance = new (Shiply as any)();
+        const { default: Shiply } = await import('./shiply/core/Shiply');
+        this.instance = new (Shiply as new () => ShiplyInstance)();
         return this.instance!;
     }
 
     private async loadNpmSDK(): Promise<ShiplyInstance> {
         // Load from npm package
         const Shiply = await import('shiply-sdk');
-        this.instance = new (Shiply as any)();
+        this.instance = new (Shiply as new () => ShiplyInstance)();
         return this.instance!;
     }
 

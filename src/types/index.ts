@@ -1,3 +1,5 @@
+import { Timestamp } from 'firebase/firestore';
+
 export interface User {
     id: string;
     email: string;
@@ -14,22 +16,28 @@ export interface UserDocument {
     email: string;
     name?: string;
     website?: string;
-    createdAt: Date;
-    lastLogin?: Date;
+    createdAt: Timestamp;
+    updatedAt: Timestamp;
+    lastLogin?: Timestamp;
     isActive: boolean;
 }
 
 // User management types
 export interface CreateUserRequest {
+    uid?: string;
     email: string;
     name?: string;
+    displayName?: string;
+    photoURL?: string;
     website?: string;
+    provider?: 'email' | 'google.com';
 }
 
 export interface UpdateUserRequest {
     name?: string;
     website?: string;
     isActive?: boolean;
+    role?: 'admin' | 'user';
 }
 
 export interface UserProfile {
