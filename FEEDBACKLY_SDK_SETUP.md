@@ -17,10 +17,10 @@ Create a `.env.local` file in the admin-portal directory:
 
 ```bash
 # Use NPM package (default)
-NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=false
+NEXT_PUBLIC_USE_LOCAL_SHIPLY_SDK=false
 
 # Use local development files
-NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=true
+NEXT_PUBLIC_USE_LOCAL_SHIPLY_SDK=true
 ```
 
 ## 📁 File Structure
@@ -62,7 +62,7 @@ admin-portal/
 3. **Test the new version**:
    ```bash
    # Ensure NPM package mode is enabled
-   echo "NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=false" > .env.local
+   echo "NEXT_PUBLIC_USE_LOCAL_SHIPLY_SDK=false" > .env.local
    npm run dev
    ```
 
@@ -79,7 +79,7 @@ admin-portal/
    ```bash
    cd ../admin-portal
    # Enable local SDK mode
-   echo "NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=true" > .env.local
+   echo "NEXT_PUBLIC_USE_LOCAL_SHIPLY_SDK=true" > .env.local
    npm run dev
    ```
 
@@ -120,10 +120,10 @@ The console will show which SDK source is being used:
 ## 🔄 Workflow for SDK Updates
 
 1. **Develop changes** in the Shiply-sdk repository
-2. **Test locally** by setting `NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=true` in `.env.local`
+2. **Test locally** by setting `NEXT_PUBLIC_USE_LOCAL_SHIPLY_SDK=true` in `.env.local`
 3. **Publish to NPM** when ready
 4. **Update admin portal** to use the new version
-5. **Test with NPM package** by setting `NEXT_PUBLIC_USE_LOCAL_FEEDBACKLY_SDK=false` in `.env.local`
+5. **Test with NPM package** by setting `NEXT_PUBLIC_USE_LOCAL_SHIPLY_SDK=false` in `.env.local`
 6. **Deploy** when everything works correctly
 
 This setup provides a clean, environment-based approach for switching between SDK sources.

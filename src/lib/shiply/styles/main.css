@@ -1,32 +1,32 @@
-/* Feedbackly Widget Styles */
+/* Shiply Widget Styles */
 
-.feedbackly-widget {
+.shiply-widget {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   box-sizing: border-box;
 }
 
-.feedbackly-widget * {
+.shiply-widget * {
   box-sizing: border-box;
 }
 
 /* Trigger Button */
-.feedbackly-trigger {
+.shiply-trigger {
   transition: all 0.3s ease;
   border: none;
   outline: none;
 }
 
-.feedbackly-trigger:hover {
+.shiply-trigger:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
 }
 
-.feedbackly-trigger:active {
+.shiply-trigger:active {
   transform: scale(0.95);
 }
 
 /* Widget Container */
-.feedbackly-widget {
+.shiply-widget {
   border: 1px solid #e1e5e9;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
@@ -34,31 +34,31 @@
 }
 
 /* Header */
-.feedbackly-header {
+.shiply-header {
   background: #f8f9fa;
   border-bottom: 1px solid #e1e5e9;
 }
 
-.feedbackly-close {
+.shiply-close {
   transition: all 0.2s ease;
 }
 
-.feedbackly-close:hover {
+.shiply-close:hover {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 50%;
 }
 
 /* Form Elements */
-.feedbackly-rating {
+.shiply-rating {
   margin-bottom: 16px;
 }
 
-.feedbackly-stars {
+.shiply-stars {
   display: flex;
   gap: 4px;
 }
 
-.feedbackly-star {
+.shiply-star {
   transition: all 0.2s ease;
   background: none;
   border: none;
@@ -66,68 +66,68 @@
   padding: 0;
 }
 
-.feedbackly-star:hover {
+.shiply-star:hover {
   transform: scale(1.1);
 }
 
-.feedbackly-textarea {
+.shiply-textarea {
   transition: border-color 0.2s ease;
   resize: vertical;
   min-height: 80px;
 }
 
-.feedbackly-textarea:focus {
+.shiply-textarea:focus {
   outline: none;
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
-.feedbackly-select {
+.shiply-select {
   transition: border-color 0.2s ease;
 }
 
-.feedbackly-select:focus {
+.shiply-select:focus {
   outline: none;
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 /* Footer */
-.feedbackly-footer {
+.shiply-footer {
   background: #f8f9fa;
   border-top: 1px solid #e1e5e9;
 }
 
-.feedbackly-cancel {
+.shiply-cancel {
   transition: all 0.2s ease;
 }
 
-.feedbackly-cancel:hover {
+.shiply-cancel:hover {
   background: #f8f9fa;
   border-color: #adb5bd;
 }
 
-.feedbackly-submit {
+.shiply-submit {
   transition: all 0.2s ease;
 }
 
-.feedbackly-submit:hover {
+.shiply-submit:hover {
   background: #0056b3;
   transform: translateY(-1px);
 }
 
-.feedbackly-submit:active {
+.shiply-submit:active {
   transform: translateY(0);
 }
 
-.feedbackly-submit:disabled {
+.shiply-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
 /* Messages */
-.feedbackly-message {
+.shiply-message {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,7 +136,7 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .feedbackly-widget {
+  .shiply-widget {
     width: 100% !important;
     height: 100% !important;
     bottom: 0 !important;
@@ -145,30 +145,30 @@
     position: fixed;
   }
   
-  .feedbackly-trigger {
+  .shiply-trigger {
     bottom: 20px !important;
     right: 20px !important;
   }
 }
 
 /* Animation Classes */
-.feedbackly-fade-in {
-  animation: feedbacklyFadeIn 0.3s ease-in-out;
+.shiply-fade-in {
+  animation: shiplyFadeIn 0.3s ease-in-out;
 }
 
-.feedbackly-fade-out {
-  animation: feedbacklyFadeOut 0.3s ease-in-out;
+.shiply-fade-out {
+  animation: shiplyFadeOut 0.3s ease-in-out;
 }
 
-.feedbackly-slide-up {
-  animation: feedbacklySlideUp 0.3s ease-in-out;
+.shiply-slide-up {
+  animation: shiplySlideUp 0.3s ease-in-out;
 }
 
-.feedbackly-slide-down {
-  animation: feedbacklySlideDown 0.3s ease-in-out;
+.shiply-slide-down {
+  animation: shiplySlideDown 0.3s ease-in-out;
 }
 
-@keyframes feedbacklyFadeIn {
+@keyframes shiplyFadeIn {
   from {
     opacity: 0;
   }
@@ -177,7 +177,7 @@
   }
 }
 
-@keyframes feedbacklyFadeOut {
+@keyframes shiplyFadeOut {
   from {
     opacity: 1;
   }
@@ -186,7 +186,7 @@
   }
 }
 
-@keyframes feedbacklySlideUp {
+@keyframes shiplySlideUp {
   from {
     transform: translateY(100%);
     opacity: 0;
@@ -197,7 +197,7 @@
   }
 }
 
-@keyframes feedbacklySlideDown {
+@keyframes shiplySlideDown {
   from {
     transform: translateY(0);
     opacity: 1;
@@ -209,12 +209,12 @@
 }
 
 /* Loading States */
-.feedbackly-loading {
+.shiply-loading {
   position: relative;
   pointer-events: none;
 }
 
-.feedbackly-loading::after {
+.shiply-loading::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -225,63 +225,63 @@
   border: 2px solid #f3f3f3;
   border-top: 2px solid #007bff;
   border-radius: 50%;
-  animation: feedbacklySpin 1s linear infinite;
+  animation: shiplySpin 1s linear infinite;
 }
 
-@keyframes feedbacklySpin {
+@keyframes shiplySpin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
 /* Accessibility */
-.feedbackly-widget:focus-within {
+.shiply-widget:focus-within {
   outline: 2px solid #007bff;
   outline-offset: 2px;
 }
 
-.feedbackly-star:focus {
+.shiply-star:focus {
   outline: 2px solid #007bff;
   outline-offset: 2px;
 }
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-  .feedbackly-widget {
+  .shiply-widget {
     background-color: #2d3748;
     border-color: #4a5568;
     color: #e2e8f0;
   }
   
-  .feedbackly-header {
+  .shiply-header {
     background-color: #1a202c;
     border-color: #4a5568;
   }
   
-  .feedbackly-footer {
+  .shiply-footer {
     background-color: #1a202c;
     border-color: #4a5568;
   }
   
-  .feedbackly-textarea,
-  .feedbackly-select {
+  .shiply-textarea,
+  .shiply-select {
     background-color: #4a5568;
     border-color: #718096;
     color: #e2e8f0;
   }
   
-  .feedbackly-textarea:focus,
-  .feedbackly-select:focus {
+  .shiply-textarea:focus,
+  .shiply-select:focus {
     border-color: #63b3ed;
     box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.25);
   }
   
-  .feedbackly-cancel {
+  .shiply-cancel {
     background-color: #4a5568;
     border-color: #718096;
     color: #e2e8f0;
   }
   
-  .feedbackly-cancel:hover {
+  .shiply-cancel:hover {
     background-color: #718096;
   }
 }
