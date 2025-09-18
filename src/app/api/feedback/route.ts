@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase-admin';
 import { addCorsHeaders, handleCorsPreflight } from '@/lib/cors';
-import { getUserByApiKey } from '@/lib/firestore';
+import { getUserByApiKey } from '@/lib/firestore-server';
+import { adminDb } from '@/lib/firebase-admin-server';
 
 // Handle CORS preflight requests
 export async function OPTIONS() {
@@ -34,6 +33,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Prepare feedback data for Firestore
+        const now = new Date();
         const feedbackData = {
             userId: user.id, // Use the actual user ID from the API key
             userEmail: user.email, // Include user email for easier identification
@@ -46,14 +46,22 @@ export async function POST(request: NextRequest) {
                 userAgent: request.headers.get('user-agent') || '',
                 ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '',
                 referer: request.headers.get('referer') || '',
-                timestamp: serverTimestamp(),
+                timestamp: now,
             },
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
+            createdAt: now,
+            updatedAt: now,
         };
 
-        // Add to Firestore
-        const docRef = await addDoc(collection(db, 'feedback'), feedbackData);
+        // Add to Firestore using Admin SDK
+        if (!adminDb) {
+            const response = NextResponse.json(
+                { error: 'Database not available' },
+                { status: 503 }
+            );
+            return addCorsHeaders(response, origin);
+        }
+        
+        const docRef = await adminDb.collection('feedback').add(feedbackData);
 
         const response = NextResponse.json({
             success: true,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { addCorsHeaders, handleCorsPreflight } from '@/lib/cors';
-import { getUserByApiKey } from '@/lib/firestore';
+import { getUserByApiKey } from '@/lib/firestore-server';
 
 // Handle CORS preflight requests
 export async function OPTIONS() {
