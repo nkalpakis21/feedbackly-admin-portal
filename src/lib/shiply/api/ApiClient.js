@@ -128,9 +128,8 @@ class ApiClient {
   /**
    * Send feedback with retry logic
    * @param {Object} feedbackData - Feedback data
-   * @param {number} _retries - Number of retries (unused in development mode)
    */
-  async submitFeedbackWithRetry(feedbackData, _retries = 3) {
+  async submitFeedbackWithRetry(feedbackData) {
     // TODO: Uncomment when API server is ready
     // For now, just call submitFeedback directly (which simulates success)
     return await this.submitFeedback(feedbackData);

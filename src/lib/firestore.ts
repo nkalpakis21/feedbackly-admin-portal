@@ -125,8 +125,28 @@ export async function getDefaultWebsiteIdForUser(uid: string): Promise<string | 
     );
     const snapshot = await getDocs(q);
     if (snapshot.empty) return null;
-    const active = snapshot.docs.find(d => (d.data() as any).isActive === true);
+    const active = snapshot.docs.find(d => {
+        const data = d.data();
+        return data.isActive === true;
+    });
     return (active ?? snapshot.docs[0]).id;
+}
+
+// NEW: User-centric functions
+export async function getUserByApiKey(apiKey: string): Promise<User | null> {
+    const q = query(usersCollection, where('apiKey', '==', apiKey));
+    const snapshot = await getDocs(q);
+    
+    if (snapshot.empty) return null;
+    
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+    return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date(),
+        lastLogin: data.lastLogin?.toDate(),
+    } as User;
 }
 
 // Analytics

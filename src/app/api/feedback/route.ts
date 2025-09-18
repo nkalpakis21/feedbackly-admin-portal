@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase-admin';
 import { addCorsHeaders, handleCorsPreflight } from '@/lib/cors';
+import { getUserByApiKey } from '@/lib/firestore';
 
 // Handle CORS preflight requests
 export async function OPTIONS() {
@@ -13,22 +14,29 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const origin = request.headers.get('origin');
 
-        // Validate required fields
-        if (!body.websiteId || !body.apiKey) {
+        // Validate required fields (only apiKey is required now)
+        if (!body.apiKey) {
             const response = NextResponse.json(
-                { error: 'Missing required fields: websiteId and apiKey' },
+                { error: 'Missing required field: apiKey' },
                 { status: 400 }
             );
             return addCorsHeaders(response, origin);
         }
 
-        // TODO: Add API key validation here
-        // For now, we'll accept any API key
+        // Validate API key and get user
+        const user = await getUserByApiKey(body.apiKey);
+        if (!user) {
+            const response = NextResponse.json(
+                { error: 'Invalid API key' },
+                { status: 401 }
+            );
+            return addCorsHeaders(response, origin);
+        }
 
         // Prepare feedback data for Firestore
         const feedbackData = {
-            websiteId: body.websiteId,
-            userId: body.userId || 'anonymous', // Add userId field (required by interface)
+            userId: user.id, // Use the actual user ID from the API key
+            userEmail: user.email, // Include user email for easier identification
             rating: body.rating || null,
             content: body.feedback || '', // Changed from 'feedback' to 'content' to match interface
             category: body.category || null,

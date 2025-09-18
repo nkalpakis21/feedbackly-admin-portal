@@ -62,7 +62,6 @@ export default function ShiplyWidget({
   const ShiplyRef = useRef<ShiplyInstance | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Track loading state; retained for future UX hooks
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [resolvedWebsiteId, setResolvedWebsiteId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -91,7 +90,6 @@ export default function ShiplyWidget({
     // Initialize Shiply SDK
     const initializeShiply = async () => {
       try {
-        setIsLoading(true);
         const effectiveWebsiteId = await resolveWebsite();
         setResolvedWebsiteId(effectiveWebsiteId);
         if (!effectiveWebsiteId) {
@@ -188,8 +186,6 @@ export default function ShiplyWidget({
       } catch (err) {
         console.error('Failed to initialize Shiply:', err);
         setError(err instanceof Error ? err.message : 'Failed to initialize feedback widget');
-      } finally {
-        setIsLoading(false);
       }
     };
 
