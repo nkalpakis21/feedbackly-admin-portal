@@ -101,7 +101,9 @@ export async function PUT(
 }
 
 // Validation function
-function validateWidgetConfig(config: any) {
+import type { WidgetConfig, WidgetTheme, WidgetPosition, WidgetSize, WidgetText, WidgetBehavior, WidgetBranding } from '@/types';
+
+function validateWidgetConfig(config: Partial<WidgetConfig>) {
     const errors: string[] = [];
 
     // Validate theme colors (hex format)
@@ -149,7 +151,7 @@ function validateWidgetConfig(config: any) {
 
     // Validate categories
     if (config.behavior?.categories) {
-        config.behavior.categories.forEach((category: any, index: number) => {
+        config.behavior.categories.forEach((category: { value: string; label: string }, index: number) => {
             if (!category.value || !category.label) {
                 errors.push(`Category ${index + 1} must have both value and label`);
             }

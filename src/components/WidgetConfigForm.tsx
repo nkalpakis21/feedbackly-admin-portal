@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { WidgetConfig, WidgetTheme, WidgetText, WidgetBehavior, WidgetCategory, WidgetPosition, WidgetSize, WidgetBranding } from '@/types';
+import { useState } from 'react';
+import { WidgetConfig, WidgetTheme, WidgetText, WidgetBehavior, WidgetPosition, WidgetSize, WidgetBranding } from '@/types';
 
 interface WidgetConfigFormProps {
     websiteId: string;

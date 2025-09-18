@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useShiplyContext } from '@/contexts/ShiplyContext';
 import { shiplyLoader, ShiplyInstance } from '@/lib/shiply-loader';
-import { shiplyConfig } from '@/lib/shiply-config';
+// import { shiplyConfig } from '@/lib/shiply-config';
 
 interface ShiplyWidgetProps {
   apiKey: string;
