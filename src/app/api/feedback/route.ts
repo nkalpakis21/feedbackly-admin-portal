@@ -28,10 +28,12 @@ export async function POST(request: NextRequest) {
         // Prepare feedback data for Firestore
         const feedbackData = {
             websiteId: body.websiteId,
+            userId: body.userId || 'anonymous', // Add userId field (required by interface)
             rating: body.rating || null,
-            feedback: body.feedback || '',
+            content: body.feedback || '', // Changed from 'feedback' to 'content' to match interface
             category: body.category || null,
             userInfo: body.userInfo || {},
+            processed: false, // Add processed field
             metadata: {
                 userAgent: request.headers.get('user-agent') || '',
                 ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '',
