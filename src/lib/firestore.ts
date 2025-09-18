@@ -114,6 +114,21 @@ export async function getWebsitesByUser(userId: string): Promise<Website[]> {
     })) as Website[];
 }
 
+// Resolve a user's default website. Strategy:
+// 1) websites where userId == uid and isActive true, order by createdAt desc, take first
+// 2) fallback to any website by the user
+export async function getDefaultWebsiteIdForUser(uid: string): Promise<string | null> {
+    const q = query(
+        websitesCollection,
+        where('userId', '==', uid),
+        orderBy('createdAt', 'desc')
+    );
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return null;
+    const active = snapshot.docs.find(d => (d.data() as any).isActive === true);
+    return (active ?? snapshot.docs[0]).id;
+}
+
 // Analytics
 export async function getAnalytics(): Promise<Analytics> {
     const [usersSnapshot, feedbackSnapshot] = await Promise.all([

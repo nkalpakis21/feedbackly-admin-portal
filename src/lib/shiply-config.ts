@@ -37,7 +37,8 @@ if (process.env.NODE_ENV === 'development') {
 export const SHIPLY_CONFIG = {
     // API Configuration
     apiKey: process.env.NEXT_PUBLIC_SHIPLY_API_KEY || '',
-    websiteId: process.env.NEXT_PUBLIC_SHIPLY_WEBSITE_ID || 'admin-portal',
+    // websiteId will be resolved at runtime from Firestore (per user/account)
+    websiteId: '',
 
     // Widget Theme - Admin Portal specific
     theme: {

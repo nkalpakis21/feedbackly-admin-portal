@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { getDefaultWebsiteIdForUser } from '@/lib/firestore';
 import { useShiplyContext } from '@/contexts/ShiplyContext';
 import { shiplyLoader, ShiplyInstance } from '@/lib/shiply-loader';
 // import { shiplyConfig } from '@/lib/shiply-config';
@@ -62,6 +63,7 @@ export default function ShiplyWidget({
   const [error, setError] = useState<string | null>(null);
   // Track loading state; retained for future UX hooks
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [resolvedWebsiteId, setResolvedWebsiteId] = useState<string | null>(null);
 
   useEffect(() => {
     // Only initialize if user is logged in
@@ -75,18 +77,35 @@ export default function ShiplyWidget({
       return;
     }
 
+    // Resolve website id for this user
+    const resolveWebsite = async (): Promise<string | null> => {
+      if (websiteId) return websiteId;
+      if (!currentUser) return null;
+      try {
+        return await getDefaultWebsiteIdForUser(currentUser.uid);
+      } catch {
+        return null;
+      }
+    };
+
     // Initialize Shiply SDK
     const initializeShiply = async () => {
       try {
         setIsLoading(true);
-        
+        const effectiveWebsiteId = await resolveWebsite();
+        setResolvedWebsiteId(effectiveWebsiteId);
+        if (!effectiveWebsiteId) {
+          setError('No website configured for this user');
+          return;
+        }
+
         // Load the appropriate SDK (npm package or local)
         const Shiply = await shiplyLoader.loadSDK();
         
         // Initialize with configuration
         Shiply.init({
           apiKey,
-          websiteId,
+          websiteId: effectiveWebsiteId,
           theme: {
             primaryColor: '#007bff',
             backgroundColor: '#ffffff',
