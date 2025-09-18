@@ -60,7 +60,8 @@ export default function ShiplyWidget({
   const { setShiplyInstance } = useShiplyContext();
   const ShiplyRef = useRef<ShiplyInstance | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // Track loading state; retained for future UX hooks
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     // Only initialize if user is logged in

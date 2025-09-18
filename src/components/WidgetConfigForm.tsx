@@ -9,7 +9,7 @@ interface WidgetConfigFormProps {
     onConfigChange: (config: WidgetConfig) => void;
 }
 
-export default function WidgetConfigForm({ websiteId, initialConfig, onConfigChange }: WidgetConfigFormProps) {
+export default function WidgetConfigForm({ initialConfig, onConfigChange }: WidgetConfigFormProps) {
     const [activeTab, setActiveTab] = useState('appearance');
     const [config, setConfig] = useState<WidgetConfig>(initialConfig || getDefaultConfig());
 

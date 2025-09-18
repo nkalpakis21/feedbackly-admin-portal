@@ -101,7 +101,7 @@ export async function PUT(
 }
 
 // Validation function
-import type { WidgetConfig, WidgetTheme, WidgetPosition, WidgetSize, WidgetText, WidgetBehavior, WidgetBranding } from '@/types';
+import type { WidgetConfig } from '@/types';
 
 function validateWidgetConfig(config: Partial<WidgetConfig>) {
     const errors: string[] = [];

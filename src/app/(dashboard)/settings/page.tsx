@@ -191,7 +191,7 @@ function ApiSettings() {
                         Integration Code
                     </label>
                     <div className="bg-gray-900 text-gray-100 p-4 rounded-md text-sm font-mono">
-                        <div className="text-green-400">// Add this to your website's &lt;head&gt; section</div>
+                        <div className="text-green-400">{/* Add this to your website&apos;s &lt;head&gt; section */}</div>
                         <div className="text-blue-400">&lt;script</div>
                         <div className="ml-4 text-yellow-300">src=&quot;https://cdn.jsdelivr.net/npm/shiply-sdk@latest/dist/shiply.min.js&quot;</div>
                         <div className="ml-4 text-yellow-300">data-api-key=&quot;sk_live_1234567890abcdef&quot;</div>
