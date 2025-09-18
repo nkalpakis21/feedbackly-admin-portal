@@ -5,7 +5,7 @@ import {
     UpdateUserRequest,
     UserProfile
 } from '@/types';
-import { Timestamp } from 'firebase/firestore';
+// Removed unused Timestamp import
 
 export class UserService {
     private userRepository: UserRepository;

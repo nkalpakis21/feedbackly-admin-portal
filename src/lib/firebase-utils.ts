@@ -89,8 +89,8 @@ export async function getAllWebsites() {
  */
 export async function testFirebaseConnection() {
     try {
-        const { collection, getDocs, limit } = await import('firebase/firestore');
-        const querySnapshot = await getDocs(collection(db, 'websites'));
+        const { collection, getDocs } = await import('firebase/firestore');
+        await getDocs(collection(db, 'websites'));
         console.log('✅ Firebase connection successful');
         return { success: true, message: 'Firebase connection successful' };
     } catch (error) {

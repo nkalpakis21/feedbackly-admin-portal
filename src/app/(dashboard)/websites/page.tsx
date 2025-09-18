@@ -92,16 +92,16 @@ export default function WebsitesPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-500">Theme:</span>
-                      <span className="text-gray-900">{website.settings.theme}</span>
+                      <span className="text-gray-900">{website.settings?.theme ?? '—'}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">Position:</span>
-                      <span className="text-gray-900">{website.settings.position}</span>
+                      <span className="text-gray-900">{website.settings?.position ?? '—'}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">Auto Collect:</span>
                       <span className="text-gray-900">
-                        {website.settings.autoCollect ? 'Yes' : 'No'}
+                        {website.settings?.autoCollect ? 'Yes' : 'No'}
                       </span>
                     </div>
                     <div className="flex justify-between">
