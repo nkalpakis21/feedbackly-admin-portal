@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { WidgetConfig, WidgetTheme, WidgetText, WidgetBehavior, WidgetCategory } from '@/types';
+import { WidgetConfig, WidgetTheme, WidgetText, WidgetBehavior, WidgetCategory, WidgetPosition, WidgetSize, WidgetBranding } from '@/types';
 
 interface WidgetConfigFormProps {
     websiteId: string;
@@ -12,7 +12,6 @@ interface WidgetConfigFormProps {
 export default function WidgetConfigForm({ websiteId, initialConfig, onConfigChange }: WidgetConfigFormProps) {
     const [activeTab, setActiveTab] = useState('appearance');
     const [config, setConfig] = useState<WidgetConfig>(initialConfig || getDefaultConfig());
-    const [previewOpen, setPreviewOpen] = useState(false);
 
     const tabs = [
         { id: 'appearance', name: 'Appearance', icon: '🎨' },
@@ -21,7 +20,10 @@ export default function WidgetConfigForm({ websiteId, initialConfig, onConfigCha
         { id: 'branding', name: 'Branding', icon: '🏢' },
     ];
 
-    const updateConfig = (section: keyof WidgetConfig, updates: any) => {
+    const updateConfig = (
+        section: keyof WidgetConfig,
+        updates: Partial<WidgetConfig[keyof WidgetConfig]>
+    ) => {
         const newConfig = {
             ...config,
             [section]: { ...config[section], ...updates }
@@ -127,11 +129,11 @@ function AppearanceSettings({
     onSizeChange 
 }: {
     theme: WidgetTheme;
-    position: any;
-    size: any;
+    position: WidgetPosition;
+    size: WidgetSize;
     onThemeChange: (theme: Partial<WidgetTheme>) => void;
-    onPositionChange: (position: any) => void;
-    onSizeChange: (size: any) => void;
+    onPositionChange: (position: Partial<WidgetPosition>) => void;
+    onSizeChange: (size: Partial<WidgetSize>) => void;
 }) {
     return (
         <div className="space-y-6">
@@ -536,7 +538,7 @@ function BehaviorSettings({ behavior, onBehaviorChange }: { behavior: WidgetBeha
 }
 
 // Branding Settings Component
-function BrandingSettings({ branding, onBrandingChange }: { branding: any; onBrandingChange: (branding: any) => void }) {
+function BrandingSettings({ branding, onBrandingChange }: { branding: WidgetBranding; onBrandingChange: (branding: Partial<WidgetBranding>) => void }) {
     return (
         <div className="space-y-6">
             <h4 className="text-lg font-medium text-gray-900">Branding</h4>

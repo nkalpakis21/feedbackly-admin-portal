@@ -141,13 +141,13 @@ export interface Website {
     apiKey: string; // Auto-generated, managed by system
     createdAt: Date;
     isActive: boolean;
-    
+
     // Admin-configurable settings
     widgetConfig: WidgetConfig;
-    
+
     // System-managed (read-only)
     systemConfig: SystemConfig;
-    
+
     // Legacy settings (for backward compatibility)
     settings?: {
         theme: string;

@@ -69,7 +69,7 @@ export async function PUT(
 
         // Validate and sanitize the configuration
         const validatedConfig = validateWidgetConfig(body.widgetConfig);
-        
+
         if (!validatedConfig.valid) {
             const response = NextResponse.json(
                 { error: 'Invalid configuration', details: validatedConfig.errors },
@@ -103,42 +103,42 @@ export async function PUT(
 // Validation function
 function validateWidgetConfig(config: any) {
     const errors: string[] = [];
-    
+
     // Validate theme colors (hex format)
     if (config.theme?.primaryColor && !/^#[0-9A-F]{6}$/i.test(config.theme.primaryColor)) {
         errors.push('Primary color must be a valid hex color');
     }
-    
+
     if (config.theme?.backgroundColor && !/^#[0-9A-F]{6}$/i.test(config.theme.backgroundColor)) {
         errors.push('Background color must be a valid hex color');
     }
-    
+
     if (config.theme?.textColor && !/^#[0-9A-F]{6}$/i.test(config.theme.textColor)) {
         errors.push('Text color must be a valid hex color');
     }
-    
+
     if (config.theme?.borderColor && !/^#[0-9A-F]{6}$/i.test(config.theme.borderColor)) {
         errors.push('Border color must be a valid hex color');
     }
-    
+
     // Validate position values
     if (config.position?.bottom && !config.position.bottom.endsWith('px')) {
         errors.push('Position bottom must be in pixels (e.g., "20px")');
     }
-    
+
     if (config.position?.right && !config.position.right.endsWith('px')) {
         errors.push('Position right must be in pixels (e.g., "20px")');
     }
-    
+
     // Validate size values
     if (config.size?.width && !config.size.width.endsWith('px')) {
         errors.push('Width must be in pixels (e.g., "350px")');
     }
-    
+
     if (config.size?.height && !config.size.height.endsWith('px')) {
         errors.push('Height must be in pixels (e.g., "500px")');
     }
-    
+
     // Validate text content (prevent XSS)
     const textFields = ['title', 'ratingLabel', 'feedbackLabel', 'feedbackPlaceholder', 'categoryLabel', 'submitButton', 'cancelButton'];
     textFields.forEach(field => {
@@ -146,7 +146,7 @@ function validateWidgetConfig(config: any) {
             errors.push(`${field} contains potentially unsafe content`);
         }
     });
-    
+
     // Validate categories
     if (config.behavior?.categories) {
         config.behavior.categories.forEach((category: any, index: number) => {
@@ -158,22 +158,22 @@ function validateWidgetConfig(config: any) {
             }
         });
     }
-    
+
     // Validate auto-show delay
     if (config.behavior?.autoShowDelay && (config.behavior.autoShowDelay < 0 || config.behavior.autoShowDelay > 60000)) {
         errors.push('Auto-show delay must be between 0 and 60000 milliseconds');
     }
-    
+
     // Validate font size
     if (config.theme?.fontSize && !config.theme.fontSize.endsWith('px')) {
         errors.push('Font size must be in pixels (e.g., "14px")');
     }
-    
+
     // Validate border radius
     if (config.theme?.borderRadius && !config.theme.borderRadius.endsWith('px')) {
         errors.push('Border radius must be in pixels (e.g., "8px")');
     }
-    
+
     return {
         valid: errors.length === 0,
         errors,
