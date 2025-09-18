@@ -142,10 +142,11 @@ function validateWidgetConfig(config: Partial<WidgetConfig>) {
     }
 
     // Validate text content (prevent XSS)
-    const textFields = ['title', 'ratingLabel', 'feedbackLabel', 'feedbackPlaceholder', 'categoryLabel', 'submitButton', 'cancelButton'];
-    textFields.forEach(field => {
-        if (config.text?.[field] && /<script|javascript:|on\w+=/i.test(config.text[field])) {
-            errors.push(`${field} contains potentially unsafe content`);
+    const textFields: Array<keyof WidgetConfig['text']> = ['title', 'ratingLabel', 'feedbackLabel', 'feedbackPlaceholder', 'categoryLabel', 'submitButton', 'cancelButton'];
+    textFields.forEach((field) => {
+        const value = config.text?.[field];
+        if (typeof value === 'string' && /<script|javascript:|on\w+=/i.test(value)) {
+            errors.push(`${String(field)} contains potentially unsafe content`);
         }
     });
 

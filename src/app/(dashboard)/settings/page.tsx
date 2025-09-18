@@ -182,7 +182,7 @@ function ApiSettings() {
                         </button>
                     </div>
                     <p className="mt-1 text-xs text-gray-500">
-                        Use this API key in your website's Shiply widget integration
+                        Use this API key in your website&apos;s Shiply widget integration
                     </p>
                 </div>
 
