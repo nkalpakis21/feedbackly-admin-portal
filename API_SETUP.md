@@ -136,3 +136,4 @@ The API routes expect the following Firestore collections:
 3. Deploy to Vercel
 4. Update widget SDK to point to new API URL
 5. Test the integration
+

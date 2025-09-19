@@ -11,8 +11,8 @@ export async function OPTIONS() {
 export async function GET(request: NextRequest) {
     try {
         const origin = request.headers.get('origin');
-        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || 
-                      request.nextUrl.searchParams.get('apiKey');
+        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') ||
+            request.nextUrl.searchParams.get('apiKey');
 
         if (!apiKey) {
             const response = NextResponse.json(

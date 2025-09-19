@@ -15,17 +15,17 @@ export async function getUserByApiKey(apiKey: string): Promise<User | null> {
             console.warn('Firebase Admin not initialized - returning null for getUserByApiKey');
             return null;
         }
-        
+
         const usersRef = adminDb.collection('users');
         const snapshot = await usersRef.where('apiKey', '==', apiKey).limit(1).get();
-        
+
         if (snapshot.empty) {
             return null;
         }
-        
+
         const doc = snapshot.docs[0];
         const data = doc.data();
-        
+
         return {
             id: doc.id,
             email: data.email,
@@ -52,16 +52,16 @@ export async function getUserById(userId: string): Promise<User | null> {
             console.warn('Firebase Admin not initialized - returning null for getUserById');
             return null;
         }
-        
+
         const userDoc = await adminDb.collection('users').doc(userId).get();
-        
+
         if (!userDoc.exists) {
             return null;
         }
-        
+
         const data = userDoc.data();
         if (!data) return null;
-        
+
         return {
             id: userDoc.id,
             email: data.email,
@@ -95,7 +95,7 @@ export async function createUser(userData: {
             console.warn('Firebase Admin not initialized - returning null for createUser');
             return null;
         }
-        
+
         const now = new Date();
         const userDoc = {
             ...userData,
@@ -103,9 +103,9 @@ export async function createUser(userData: {
             createdAt: now,
             updatedAt: now,
         };
-        
+
         const docRef = await adminDb.collection('users').add(userDoc);
-        
+
         return {
             id: docRef.id,
             ...userDoc,
@@ -125,7 +125,7 @@ export async function updateUserSdkConfig(userId: string, sdkConfig: WidgetConfi
             console.warn('Firebase Admin not initialized - returning false for updateUserSdkConfig');
             return false;
         }
-        
+
         await adminDb.collection('users').doc(userId).update({
             sdkConfig,
             updatedAt: new Date(),

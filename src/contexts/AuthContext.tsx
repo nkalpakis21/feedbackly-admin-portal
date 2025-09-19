@@ -1,15 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import {
-  User,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-} from 'firebase/auth';
-import { auth, googleProvider } from '@/lib/firebase';
+import { User, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { AuthService } from '@/services/auth/AuthService';
+import { UserService } from '@/services/user/UserService';
+import { UserRepository } from '@/repositories/user/UserRepository';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -30,20 +26,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  function signup(email: string, password: string) {
-    return createUserWithEmailAndPassword(auth, email, password).then(() => {});
+  // Initialize services
+  const userRepository = new UserRepository();
+  const userService = new UserService(userRepository);
+  const authService = new AuthService(userService);
+
+  async function signup(email: string, password: string) {
+    try {
+      await authService.signUpWithEmail(email, password);
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
   }
 
-  function login(email: string, password: string) {
-    return signInWithEmailAndPassword(auth, email, password).then(() => {});
+  async function login(email: string, password: string) {
+    try {
+      await authService.signInWithEmail(email, password);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   }
 
-  function loginWithGoogle() {
-    return signInWithPopup(auth, googleProvider).then(() => {});
+  async function loginWithGoogle() {
+    try {
+      await authService.signInWithGoogle();
+    } catch (error) {
+      console.error('Google login error:', error);
+      throw error;
+    }
   }
 
-  function logout() {
-    return signOut(auth);
+  async function logout() {
+    try {
+      await authService.signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
+    }
   }
 
   useEffect(() => {
