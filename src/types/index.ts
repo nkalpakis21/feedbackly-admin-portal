@@ -7,7 +7,7 @@ export interface User {
     createdAt: Date;
     lastLogin?: Date;
     isActive: boolean;
-    
+
     // NEW: User-centric API and configuration
     apiKey: string;           // Auto-generated on registration
     sdkConfig: WidgetConfig;  // User's widget configuration
@@ -22,7 +22,7 @@ export interface UserDocument {
     updatedAt: Timestamp;
     lastLogin?: Timestamp;
     isActive: boolean;
-    
+
     // NEW: User-centric API and configuration
     apiKey: string;           // Auto-generated on registration
     sdkConfig: WidgetConfig;  // User's widget configuration
@@ -53,7 +53,7 @@ export interface UserProfile {
     createdAt: Date;
     lastLogin?: Date;
     isActive: boolean;
-    
+
     // NEW: User-centric API and configuration
     apiKey: string;           // Auto-generated on registration
     sdkConfig: WidgetConfig;  // User's widget configuration
