@@ -20,7 +20,7 @@ export default function TestApiPage() {
           websiteId: 'admin-portal',
           apiKey: 'your-api-key-here',
           rating: 5,
-          feedback: 'This is a test feedback from the API test page',
+          content: 'This is a test feedback from the API test page',
           category: 'general',
           userInfo: {
             email: 'test@example.com',

@@ -11,8 +11,9 @@ import { User, WidgetConfig } from '@/types';
  */
 export async function getUserByApiKey(apiKey: string): Promise<User | null> {
     try {
+        console.log('🔍 Debug: getUserByApiKey called with:', apiKey);
         if (!adminDb) {
-            console.warn('Firebase Admin not initialized - returning null for getUserByApiKey');
+            console.warn('❌ Firebase Admin not initialized - returning null for getUserByApiKey');
             return null;
         }
 
@@ -20,6 +21,7 @@ export async function getUserByApiKey(apiKey: string): Promise<User | null> {
         const snapshot = await usersRef.where('apiKey', '==', apiKey).limit(1).get();
 
         if (snapshot.empty) {
+            console.log('❌ No user found with API key:', apiKey);
             return null;
         }
 

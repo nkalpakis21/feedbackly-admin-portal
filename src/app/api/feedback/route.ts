@@ -10,7 +10,7 @@ export async function OPTIONS(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { apiKey, content, feedback, rating, category, metadata } = body;
+        const { apiKey, content, rating, category, metadata } = body;
 
         // Validate required fields
         if (!apiKey) {
@@ -21,9 +21,7 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(response);
         }
 
-        // Use content or feedback field (for backward compatibility)
-        const feedbackContent = content || feedback;
-        if (!feedbackContent) {
+        if (!content) {
             const response = NextResponse.json(
                 { error: 'Feedback content is required' },
                 { status: 400 }
@@ -32,7 +30,9 @@ export async function POST(request: NextRequest) {
         }
 
         // Get user by API key
+        console.log('🔍 Debug: Looking up user with API key:', apiKey);
         const user = await getUserByApiKey(apiKey);
+        console.log('🔍 Debug: User lookup result:', user ? 'User found' : 'User not found');
         if (!user) {
             const response = NextResponse.json(
                 { error: 'Invalid API key' },
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
         // Prepare feedback data
         const feedbackData = {
-            content: feedbackContent,
+            content,
             rating: rating || null,
             category: category || 'general',
             metadata: metadata || {},

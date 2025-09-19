@@ -626,7 +626,7 @@ class ShipWidget {
     try {
       const feedbackData = {
         rating: this.rating,
-        feedback: this.feedbackText,
+        content: this.feedbackText,
         category: this.categorySelect ? this.categorySelect.value : null,
         url: window.location.href,
         userAgent: navigator.userAgent,
