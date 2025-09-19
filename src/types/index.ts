@@ -2,6 +2,7 @@ import { Timestamp } from 'firebase/firestore';
 
 export interface User {
     id: string;
+    uid: string;              // Firebase UID
     email: string;
     name?: string;
     createdAt: Date;
@@ -16,6 +17,7 @@ export interface User {
 // Firestore document types
 export interface UserDocument {
     id: string;
+    uid: string;              // Firebase UID
     email: string;
     name?: string;
     createdAt: Timestamp;
@@ -48,6 +50,7 @@ export interface UpdateUserRequest {
 
 export interface UserProfile {
     id: string;
+    uid: string;              // Firebase UID
     email: string;
     name?: string;
     createdAt: Date;

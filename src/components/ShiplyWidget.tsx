@@ -81,10 +81,14 @@ export default function ShiplyWidget({
     const getUserApiKey = async (): Promise<string | null> => {
       if (!currentUser) return null;
       try {
+        console.log('🔍 Getting user document for UID:', currentUser.uid);
         const userDoc = await getUser(currentUser.uid);
-        return userDoc?.apiKey || null;
+        console.log('📄 User document:', userDoc);
+        const apiKey = userDoc?.apiKey || null;
+        console.log('🔑 User API key:', apiKey ? `${apiKey.substring(0, 8)}...` : 'null');
+        return apiKey;
       } catch (error) {
-        console.error('Error getting user API key:', error);
+        console.error('❌ Error getting user API key:', error);
         return null;
       }
     };
@@ -92,17 +96,23 @@ export default function ShiplyWidget({
     // Initialize Shiply SDK
     const initializeShiply = async () => {
       try {
+        console.log('🚀 Starting Shiply widget initialization...');
         const effectiveApiKey = await getUserApiKey();
         setUserApiKey(effectiveApiKey);
         if (!effectiveApiKey) {
+          console.error('❌ No API key found for this user');
           setError('No API key found for this user');
           return;
         }
+        console.log('✅ API key found, proceeding with SDK initialization...');
 
         // Load the appropriate SDK (npm package or local)
+        console.log('📦 Loading Shiply SDK...');
         const Shiply = await shiplyLoader.loadSDK();
+        console.log('✅ SDK loaded successfully');
         
         // Initialize with configuration
+        console.log('⚙️ Initializing Shiply with config...');
         Shiply.init({
           apiKey: effectiveApiKey,
           websiteId: 'admin-portal', // Use a fixed identifier for the admin portal
@@ -158,6 +168,7 @@ export default function ShiplyWidget({
         ShiplyRef.current = Shiply;
         setShiplyInstance(Shiply);
         setError(null);
+        console.log('🎉 Shiply widget initialized successfully!');
 
         // Set user information
         Shiply.setUser({
@@ -215,9 +226,29 @@ export default function ShiplyWidget({
     }
   }, [currentUser]);
 
-  // Don't render anything if user is not logged in or there's an error
-  if (!currentUser || error) {
+  // Don't render anything if user is not logged in
+  if (!currentUser) {
     return null;
+  }
+
+  // Show error if there is one (for debugging)
+  if (error) {
+    return (
+      <div style={{ 
+        position: 'fixed', 
+        bottom: '20px', 
+        right: '20px', 
+        background: '#ff4444', 
+        color: 'white', 
+        padding: '10px', 
+        borderRadius: '5px',
+        zIndex: 10000,
+        fontSize: '12px',
+        maxWidth: '300px'
+      }}>
+        <strong>Widget Error:</strong> {error}
+      </div>
+    );
   }
 
   // The widget is rendered by the SDK itself, so we don't need to return JSX
