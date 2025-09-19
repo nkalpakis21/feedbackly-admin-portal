@@ -2,14 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getDefaultWebsiteIdForUser } from '@/lib/firestore';
+import { getUser } from '@/lib/firestore';
 import { useShiplyContext } from '@/contexts/ShiplyContext';
 import { shiplyLoader, ShiplyInstance } from '@/lib/shiply-loader';
 // import { shiplyConfig } from '@/lib/shiply-config';
 
 interface ShiplyWidgetProps {
-  apiKey: string;
-  websiteId: string;
+  // apiKey and websiteId are now resolved from the user's profile
+  apiKey?: string; // Optional, will be overridden by user's API key
+  websiteId?: string; // Optional, will be overridden with 'admin-portal'
   theme?: {
     primaryColor?: string;
     backgroundColor?: string;
@@ -47,8 +48,8 @@ interface ShiplyWidgetProps {
 }
 
 export default function ShiplyWidget({
-  apiKey,
-  websiteId,
+  apiKey: _apiKey, // Renamed to indicate it's not used
+  websiteId: _websiteId, // Renamed to indicate it's not used
   theme = {},
   position = {},
   size = {},
@@ -61,8 +62,7 @@ export default function ShiplyWidget({
   const { setShiplyInstance } = useShiplyContext();
   const ShiplyRef = useRef<ShiplyInstance | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // Track loading state; retained for future UX hooks
-  const [resolvedWebsiteId, setResolvedWebsiteId] = useState<string | null>(null);
+  const [userApiKey, setUserApiKey] = useState<string | null>(null);
 
   useEffect(() => {
     // Only initialize if user is logged in
@@ -73,16 +73,18 @@ export default function ShiplyWidget({
         ShiplyRef.current = null;
         setShiplyInstance(null);
       }
+      setUserApiKey(null);
       return;
     }
 
-    // Resolve website id for this user
-    const resolveWebsite = async (): Promise<string | null> => {
-      if (websiteId) return websiteId;
+    // Get user's API key from their user document
+    const getUserApiKey = async (): Promise<string | null> => {
       if (!currentUser) return null;
       try {
-        return await getDefaultWebsiteIdForUser(currentUser.uid);
-      } catch {
+        const userDoc = await getUser(currentUser.uid);
+        return userDoc?.apiKey || null;
+      } catch (error) {
+        console.error('Error getting user API key:', error);
         return null;
       }
     };
@@ -90,10 +92,10 @@ export default function ShiplyWidget({
     // Initialize Shiply SDK
     const initializeShiply = async () => {
       try {
-        const effectiveWebsiteId = await resolveWebsite();
-        setResolvedWebsiteId(effectiveWebsiteId);
-        if (!effectiveWebsiteId) {
-          setError('No website configured for this user');
+        const effectiveApiKey = await getUserApiKey();
+        setUserApiKey(effectiveApiKey);
+        if (!effectiveApiKey) {
+          setError('No API key found for this user');
           return;
         }
 
@@ -102,8 +104,8 @@ export default function ShiplyWidget({
         
         // Initialize with configuration
         Shiply.init({
-          apiKey,
-          websiteId: effectiveWebsiteId,
+          apiKey: effectiveApiKey,
+          websiteId: 'admin-portal', // Use a fixed identifier for the admin portal
           theme: {
             primaryColor: '#007bff',
             backgroundColor: '#ffffff',
@@ -199,7 +201,7 @@ export default function ShiplyWidget({
         setShiplyInstance(null);
       }
     };
-  }, [currentUser, apiKey, websiteId, theme, position, size, text, categories, autoShow, autoShowDelay, setShiplyInstance]);
+  }, [currentUser, theme, position, size, text, categories, autoShow, autoShowDelay, setShiplyInstance]);
 
   // Update user info when currentUser changes
   useEffect(() => {
