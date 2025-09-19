@@ -48,8 +48,8 @@ interface ShiplyWidgetProps {
 }
 
 export default function ShiplyWidget({
-  apiKey: _apiKey, // Renamed to indicate it's not used
-  websiteId: _websiteId, // Renamed to indicate it's not used
+  apiKey: _apiKey, // Not used - API key is resolved from user document
+  websiteId: _websiteId, // Not used - websiteId is set to 'admin-portal'
   theme = {},
   position = {},
   size = {},
@@ -62,7 +62,6 @@ export default function ShiplyWidget({
   const { setShiplyInstance } = useShiplyContext();
   const ShiplyRef = useRef<ShiplyInstance | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [userApiKey, setUserApiKey] = useState<string | null>(null);
 
   useEffect(() => {
     // Only initialize if user is logged in
@@ -73,7 +72,6 @@ export default function ShiplyWidget({
         ShiplyRef.current = null;
         setShiplyInstance(null);
       }
-      setUserApiKey(null);
       return;
     }
 
@@ -81,14 +79,10 @@ export default function ShiplyWidget({
     const getUserApiKey = async (): Promise<string | null> => {
       if (!currentUser) return null;
       try {
-        console.log('🔍 Getting user document for UID:', currentUser.uid);
         const userDoc = await getUser(currentUser.uid);
-        console.log('📄 User document:', userDoc);
-        const apiKey = userDoc?.apiKey || null;
-        console.log('🔑 User API key:', apiKey ? `${apiKey.substring(0, 8)}...` : 'null');
-        return apiKey;
+        return userDoc?.apiKey || null;
       } catch (error) {
-        console.error('❌ Error getting user API key:', error);
+        console.error('Error getting user API key:', error);
         return null;
       }
     };
@@ -96,23 +90,16 @@ export default function ShiplyWidget({
     // Initialize Shiply SDK
     const initializeShiply = async () => {
       try {
-        console.log('🚀 Starting Shiply widget initialization...');
         const effectiveApiKey = await getUserApiKey();
-        setUserApiKey(effectiveApiKey);
         if (!effectiveApiKey) {
-          console.error('❌ No API key found for this user');
           setError('No API key found for this user');
           return;
         }
-        console.log('✅ API key found, proceeding with SDK initialization...');
 
         // Load the appropriate SDK (npm package or local)
-        console.log('📦 Loading Shiply SDK...');
         const Shiply = await shiplyLoader.loadSDK();
-        console.log('✅ SDK loaded successfully');
         
         // Initialize with configuration
-        console.log('⚙️ Initializing Shiply with config...');
         Shiply.init({
           apiKey: effectiveApiKey,
           websiteId: 'admin-portal', // Use a fixed identifier for the admin portal
@@ -168,7 +155,6 @@ export default function ShiplyWidget({
         ShiplyRef.current = Shiply;
         setShiplyInstance(Shiply);
         setError(null);
-        console.log('🎉 Shiply widget initialized successfully!');
 
         // Set user information
         Shiply.setUser({
