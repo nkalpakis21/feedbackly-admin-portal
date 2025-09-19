@@ -28,11 +28,11 @@ export function debounce(func, wait) {
  */
 export function throttle(func, limit) {
   let inThrottle;
-  return function(...args) {
+  return function (...args) {
     if (!inThrottle) {
       func.apply(this, args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => (inThrottle = false), limit);
     }
   };
 }
@@ -53,15 +53,19 @@ export function generateId() {
  */
 export function deepMerge(target, source) {
   const result = { ...target };
-  
+
   for (const key in source) {
-    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+    if (
+      source[key] &&
+      typeof source[key] === 'object' &&
+      !Array.isArray(source[key])
+    ) {
       result[key] = deepMerge(result[key] || {}, source[key]);
     } else {
       result[key] = source[key];
     }
   }
-  
+
   return result;
 }
 
@@ -87,7 +91,7 @@ export function getBrowserInfo() {
     edge: /Edge/.test(ua),
     ie: /MSIE|Trident/.test(ua),
   };
-  
+
   return {
     userAgent: ua,
     language: navigator.language,
@@ -95,3 +99,4 @@ export function getBrowserInfo() {
     ...browsers,
   };
 }
+

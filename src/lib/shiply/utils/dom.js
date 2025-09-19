@@ -10,20 +10,20 @@
  */
 export function createElement(tagName, options = {}) {
   const element = document.createElement(tagName);
-  
+
   // Set attributes
   if (options.attributes) {
     Object.entries(options.attributes).forEach(([key, value]) => {
       element.setAttribute(key, value);
     });
   }
-  
+
   // Set properties
   Object.keys(options).forEach(key => {
     if (key === 'attributes' || key === 'style' || key === 'events') {
       return;
     }
-    
+
     if (key === 'className') {
       element.className = options[key];
     } else if (key === 'textContent') {
@@ -36,12 +36,12 @@ export function createElement(tagName, options = {}) {
       element[key] = options[key];
     }
   });
-  
+
   // Set styles
   if (options.style) {
     Object.assign(element.style, options.style);
   }
-  
+
   return element;
 }
 
@@ -51,9 +51,25 @@ export function createElement(tagName, options = {}) {
  * @param {Object} events - Event listeners object
  */
 export function addEventListeners(element, events) {
-  Object.entries(events).forEach(([event, handler]) => {
-    element.addEventListener(event, handler);
-  });
+  // Validate inputs
+  if (!element || !events || typeof events !== 'object') {
+    console.warn('addEventListeners: Invalid element or events object');
+    return;
+  }
+
+  try {
+    Object.entries(events).forEach(([event, handler]) => {
+      if (typeof handler === 'function') {
+        element.addEventListener(event, handler);
+      } else {
+        console.warn(
+          `addEventListeners: Handler for event '${event}' is not a function`
+        );
+      }
+    });
+  } catch (error) {
+    console.error('Error adding event listeners:', error);
+  }
 }
 
 /**
@@ -62,12 +78,21 @@ export function addEventListeners(element, events) {
  * @param {Object} events - Event listeners object
  */
 export function removeEventListeners(element, events) {
-  if (!events || typeof events !== 'object') {
+  // Validate inputs
+  if (!element || !events || typeof events !== 'object') {
+    console.warn('removeEventListeners: Invalid element or events object');
     return;
   }
-  Object.entries(events).forEach(([event, handler]) => {
-    element.removeEventListener(event, handler);
-  });
+
+  try {
+    Object.entries(events).forEach(([event, handler]) => {
+      if (typeof handler === 'function') {
+        element.removeEventListener(event, handler);
+      }
+    });
+  } catch (error) {
+    console.error('Error removing event listeners:', error);
+  }
 }
 
 /**
@@ -80,7 +105,8 @@ export function isInViewport(element) {
   return (
     rect.top >= 0 &&
     rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.bottom <=
+      (window.innerHeight || document.documentElement.clientHeight) &&
     rect.right <= (window.innerWidth || document.documentElement.clientWidth)
   );
 }
@@ -113,7 +139,7 @@ export function scrollIntoView(element, options = {}) {
     block: 'center',
     inline: 'nearest',
   };
-  
+
   element.scrollIntoView({ ...defaultOptions, ...options });
 }
 
@@ -225,7 +251,7 @@ export function waitForElement(selector, timeout = 5000) {
       resolve(element);
       return;
     }
-    
+
     const observer = new MutationObserver((mutations, obs) => {
       const element = document.querySelector(selector);
       if (element) {
@@ -233,12 +259,12 @@ export function waitForElement(selector, timeout = 5000) {
         resolve(element);
       }
     });
-    
+
     observer.observe(document.body, {
       childList: true,
       subtree: true,
     });
-    
+
     setTimeout(() => {
       observer.disconnect();
       reject(new Error(`Element ${selector} not found within ${timeout}ms`));

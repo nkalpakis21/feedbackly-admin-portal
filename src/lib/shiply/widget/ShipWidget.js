@@ -5,9 +5,9 @@ import {
 } from '../utils/dom';
 
 /**
- * Ship Widget Component
+ * Feedback Widget Component
  */
-class ShipWidget {
+class FeedbackWidget {
   constructor(config, apiClient) {
     this.config = config;
     this.apiClient = apiClient;
@@ -626,7 +626,7 @@ class ShipWidget {
     try {
       const feedbackData = {
         rating: this.rating,
-        content: this.feedbackText,
+        feedback: this.feedbackText,
         category: this.categorySelect ? this.categorySelect.value : null,
         url: window.location.href,
         userAgent: navigator.userAgent,
@@ -699,8 +699,7 @@ class ShipWidget {
     if (this.categorySelect) {
       this.categorySelect.value = '';
     }
-    this.updateEmojiDisplay();
-    this.updateSubmitButton();
+    this.updateStarDisplay();
   }
 
   /**
@@ -782,4 +781,4 @@ class ShipWidget {
   }
 }
 
-export default ShipWidget;
+export default FeedbackWidget;

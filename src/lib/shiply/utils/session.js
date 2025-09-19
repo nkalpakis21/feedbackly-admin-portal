@@ -14,12 +14,12 @@ const STORAGE_KEYS = {
  */
 export function generateUserId() {
   let userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
-  
+
   if (!userId) {
-    userId = 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    userId = `user_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`;
     localStorage.setItem(STORAGE_KEYS.USER_ID, userId);
   }
-  
+
   return userId;
 }
 
@@ -29,13 +29,16 @@ export function generateUserId() {
  */
 export function getSessionId() {
   let sessionId = sessionStorage.getItem(STORAGE_KEYS.SESSION_ID);
-  
+
   if (!sessionId) {
-    sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    sessionId = `session_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`;
     sessionStorage.setItem(STORAGE_KEYS.SESSION_ID, sessionId);
-    sessionStorage.setItem(STORAGE_KEYS.SESSION_START, new Date().toISOString());
+    sessionStorage.setItem(
+      STORAGE_KEYS.SESSION_START,
+      new Date().toISOString()
+    );
   }
-  
+
   return sessionId;
 }
 
@@ -44,7 +47,10 @@ export function getSessionId() {
  * @returns {string} Session start time
  */
 export function getSessionStart() {
-  return sessionStorage.getItem(STORAGE_KEYS.SESSION_START) || new Date().toISOString();
+  return (
+    sessionStorage.getItem(STORAGE_KEYS.SESSION_START) ||
+    new Date().toISOString()
+  );
 }
 
 /**
@@ -62,3 +68,4 @@ export function clearAllData() {
   localStorage.removeItem(STORAGE_KEYS.USER_ID);
   clearSession();
 }
+

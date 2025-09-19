@@ -8,3 +8,4 @@ export default Shiply;
 if (typeof window !== 'undefined') {
   window.Shiply = Shiply;
 }
+
