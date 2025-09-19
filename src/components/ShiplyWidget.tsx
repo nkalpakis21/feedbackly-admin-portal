@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getUser } from '@/lib/firestore';
 import { useShiplyContext } from '@/contexts/ShiplyContext';
 import { shiplyLoader, ShiplyInstance } from '@/lib/shiply-loader';
+import { WidgetConfig } from '@/types';
 // import { shiplyConfig } from '@/lib/shiply-config';
 
 interface ShiplyWidgetProps {
@@ -75,14 +76,18 @@ export default function ShiplyWidget({
       return;
     }
 
-    // Get user's API key from their user document
-    const getUserApiKey = async (): Promise<string | null> => {
+    // Get user's API key and SDK config from their user document
+    const getUserData = async (): Promise<{ apiKey: string; sdkConfig: WidgetConfig } | null> => {
       if (!currentUser) return null;
       try {
         const userDoc = await getUser(currentUser.uid);
-        return userDoc?.apiKey || null;
+        if (!userDoc?.apiKey || !userDoc?.sdkConfig) return null;
+        return {
+          apiKey: userDoc.apiKey,
+          sdkConfig: userDoc.sdkConfig
+        };
       } catch (error) {
-        console.error('Error getting user API key:', error);
+        console.error('Error getting user data:', error);
         return null;
       }
     };
@@ -90,59 +95,47 @@ export default function ShiplyWidget({
     // Initialize Shiply SDK
     const initializeShiply = async () => {
       try {
-        const effectiveApiKey = await getUserApiKey();
-        if (!effectiveApiKey) {
-          setError('No API key found for this user');
+        const userData = await getUserData();
+        if (!userData) {
+          setError('No user data found (API key or SDK config missing)');
           return;
         }
 
         // Load the appropriate SDK (npm package or local)
         const Shiply = await shiplyLoader.loadSDK();
         
-        // Initialize with configuration
+        // Initialize with user's SDK config, merging with any passed props
         Shiply.init({
-          apiKey: effectiveApiKey,
-          websiteId: 'admin-portal', // Use a fixed identifier for the admin portal
+          apiKey: userData.apiKey,
+          websiteId: 'admin-portal', // Keep for SDK compatibility, but not used for config fetching
           theme: {
-            primaryColor: '#007bff',
-            backgroundColor: '#ffffff',
-            textColor: '#333333',
-            borderColor: '#e1e5e9',
-            borderRadius: '8px',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            fontSize: '14px',
-            headerBackgroundColor: '#f8f9fa',
-            footerBackgroundColor: '#f8f9fa',
+            ...userData.sdkConfig.theme,
             ...theme,
           },
           position: {
-            bottom: '20px',
-            right: '20px',
+            ...userData.sdkConfig.position,
             ...position,
           },
           size: {
-            width: '350px',
-            height: '500px',
+            ...userData.sdkConfig.size,
             ...size,
           },
           text: {
-            title: 'Share Your Feedback',
-            ratingLabel: 'How would you rate your experience?',
-            feedbackLabel: 'Tell us more (optional)',
-            feedbackPlaceholder: 'Share your thoughts, suggestions, or report any issues...',
-            categoryLabel: 'Category',
-            submitButton: 'Submit',
-            cancelButton: 'Cancel',
+            ...userData.sdkConfig.text,
             ...text,
           },
           categories: [
-            { value: 'bug', label: 'Bug Report' },
-            { value: 'feature', label: 'Feature Request' },
-            { value: 'ui', label: 'UI/UX Issue' },
-            { value: 'performance', label: 'Performance Issue' },
-            { value: 'general', label: 'General Feedback' },
+            ...userData.sdkConfig.behavior.categories,
             ...categories,
           ],
+          behavior: {
+            ...userData.sdkConfig.behavior,
+            autoShow,
+            autoShowDelay,
+          },
+          branding: {
+            ...userData.sdkConfig.branding,
+          },
           user: {
             id: currentUser.uid,
             email: currentUser.email || '',
