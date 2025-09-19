@@ -49,8 +49,8 @@ interface ShiplyWidgetProps {
 }
 
 export default function ShiplyWidget({
-  apiKey: _apiKey, // Not used - API key is resolved from user document
-  websiteId: _websiteId, // Not used - websiteId is set to 'admin-portal'
+  apiKey: _apiKey, // eslint-disable-line @typescript-eslint/no-unused-vars
+  websiteId: _websiteId, // eslint-disable-line @typescript-eslint/no-unused-vars
   theme = {},
   position = {},
   size = {},

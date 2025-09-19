@@ -3,7 +3,7 @@ import { addCorsHeaders, handleCorsPreflight } from '@/lib/cors';
 import { getUserByApiKey } from '@/lib/firestore-server';
 import { adminDb } from '@/lib/firebase-admin-server';
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) { // eslint-disable-line @typescript-eslint/no-unused-vars
     return handleCorsPreflight();
 }
 
