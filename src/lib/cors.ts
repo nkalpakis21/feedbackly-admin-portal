@@ -27,3 +27,5 @@ export function handleCorsPreflight(): NextResponse {
     const response = new NextResponse(null, { status: 200 });
     return addCorsHeaders(response);
 }
+
+

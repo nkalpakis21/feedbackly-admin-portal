@@ -1,65 +1,79 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase-admin';
 import { addCorsHeaders, handleCorsPreflight } from '@/lib/cors';
+import { getUserByApiKey } from '@/lib/firestore-server';
+import { adminDb } from '@/lib/firebase-admin-server';
 
-// Handle CORS preflight requests
-export async function OPTIONS() {
+export async function OPTIONS(request: NextRequest) {
     return handleCorsPreflight();
 }
 
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const origin = request.headers.get('origin');
+        const { apiKey, content, rating, category, metadata } = body;
 
         // Validate required fields
-        if (!body.websiteId || !body.apiKey) {
+        if (!apiKey) {
             const response = NextResponse.json(
-                { error: 'Missing required fields: websiteId and apiKey' },
+                { error: 'API key is required' },
                 { status: 400 }
             );
-            return addCorsHeaders(response, origin);
+            return addCorsHeaders(response);
         }
 
-        // TODO: Add API key validation here
-        // For now, we'll accept any API key
+        if (!content) {
+            const response = NextResponse.json(
+                { error: 'Feedback content is required' },
+                { status: 400 }
+            );
+            return addCorsHeaders(response);
+        }
 
-        // Prepare feedback data for Firestore
+        // Get user by API key
+        const user = await getUserByApiKey(apiKey);
+        if (!user) {
+            const response = NextResponse.json(
+                { error: 'Invalid API key' },
+                { status: 401 }
+            );
+            return addCorsHeaders(response);
+        }
+
+        // Prepare feedback data
         const feedbackData = {
-            websiteId: body.websiteId,
-            userId: body.userId || 'anonymous', // Add userId field (required by interface)
-            rating: body.rating || null,
-            content: body.feedback || '', // Changed from 'feedback' to 'content' to match interface
-            category: body.category || null,
-            userInfo: body.userInfo || {},
-            processed: false, // Add processed field
-            metadata: {
-                userAgent: request.headers.get('user-agent') || '',
-                ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '',
-                referer: request.headers.get('referer') || '',
-                timestamp: serverTimestamp(),
-            },
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
+            content,
+            rating: rating || null,
+            category: category || 'general',
+            metadata: metadata || {},
+            userId: user.id,
+            userEmail: user.email,
+            processed: false,
+            createdAt: new Date(),
         };
 
-        // Add to Firestore
-        const docRef = await addDoc(collection(db, 'feedback'), feedbackData);
+        // Store feedback in Firestore
+        if (adminDb) {
+            await adminDb.collection('feedback').add(feedbackData);
+        } else {
+            console.error('Admin database not available');
+            const response = NextResponse.json(
+                { error: 'Database not available' },
+                { status: 500 }
+            );
+            return addCorsHeaders(response);
+        }
 
-        const response = NextResponse.json({
-            success: true,
-            message: 'Feedback submitted successfully',
-            feedbackId: docRef.id,
-        });
-        return addCorsHeaders(response, origin);
-
+        const response = NextResponse.json(
+            { success: true, message: 'Feedback submitted successfully' },
+            { status: 201 }
+        );
+        return addCorsHeaders(response);
     } catch (error) {
         console.error('Error submitting feedback:', error);
         const response = NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
         );
-        return addCorsHeaders(response, request.headers.get('origin'));
+        return addCorsHeaders(response);
     }
 }

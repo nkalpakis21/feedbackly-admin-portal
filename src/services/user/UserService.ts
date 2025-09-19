@@ -5,6 +5,7 @@ import {
     UpdateUserRequest,
     UserProfile
 } from '@/types';
+import { generateApiKey, getDefaultWidgetConfig } from '@/lib/user-utils';
 // Removed unused Timestamp import
 
 export class UserService {
@@ -30,12 +31,18 @@ export class UserService {
                 }
             }
 
+            // Generate API key and default config for new user
+            const apiKey = generateApiKey();
+            const sdkConfig = getDefaultWidgetConfig();
+
             // Create user document
             const userDocument = await this.userRepository.create({
                 email: userData.email,
                 name: userData.displayName || userData.name,
                 website: userData.website,
                 isActive: true,
+                apiKey,
+                sdkConfig,
             });
 
             return userDocument;
@@ -245,6 +252,8 @@ export class UserService {
             createdAt: userDoc.createdAt.toDate(),
             lastLogin: userDoc.lastLogin?.toDate(),
             isActive: userDoc.isActive,
+            apiKey: userDoc.apiKey,
+            sdkConfig: userDoc.sdkConfig,
         };
     }
 
