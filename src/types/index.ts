@@ -4,7 +4,6 @@ export interface User {
     id: string;
     email: string;
     name?: string;
-    website?: string;
     createdAt: Date;
     lastLogin?: Date;
     isActive: boolean;
@@ -19,7 +18,6 @@ export interface UserDocument {
     id: string;
     email: string;
     name?: string;
-    website?: string;
     createdAt: Timestamp;
     updatedAt: Timestamp;
     lastLogin?: Timestamp;
@@ -52,7 +50,6 @@ export interface UserProfile {
     id: string;
     email: string;
     name?: string;
-    website?: string;
     createdAt: Date;
     lastLogin?: Date;
     isActive: boolean;

@@ -39,7 +39,6 @@ export class UserService {
             const userDocument = await this.userRepository.create({
                 email: userData.email,
                 name: userData.displayName || userData.name,
-                website: userData.website,
                 isActive: true,
                 apiKey,
                 sdkConfig,
@@ -248,7 +247,6 @@ export class UserService {
             id: userDoc.id,
             email: userDoc.email,
             name: userDoc.name,
-            website: userDoc.website,
             createdAt: userDoc.createdAt.toDate(),
             lastLogin: userDoc.lastLogin?.toDate(),
             isActive: userDoc.isActive,
