@@ -51,13 +51,17 @@ Tracks custom events.
 }
 ```
 
-### 3. GET /api/widget/config/[websiteId]
-Retrieves widget configuration for a specific website.
+### 3. GET /api/user/config
+Retrieves user-specific widget configuration using API key authentication.
+
+**Headers:**
+```
+Authorization: Bearer <api_key>
+```
 
 **Response:**
 ```json
 {
-  "websiteId": "string",
   "theme": {
     "primaryColor": "string",
     "backgroundColor": "string",
@@ -77,12 +81,6 @@ Retrieves widget configuration for a specific website.
     "width": "string",
     "height": "string"
   },
-  "zIndex": "number",
-  "trigger": {
-    "icon": "string",
-    "size": "string",
-    "iconSize": "string"
-  },
   "text": {
     "title": "string",
     "ratingLabel": "string",
@@ -92,11 +90,16 @@ Retrieves widget configuration for a specific website.
     "submitButton": "string",
     "cancelButton": "string"
   },
-  "categories": "array",
-  "autoShow": "boolean",
-  "autoShowDelay": "number",
-  "showOnExit": "boolean",
-  "user": "object"
+  "behavior": {
+    "autoShow": "boolean",
+    "autoShowDelay": "number",
+    "showOnExit": "boolean",
+    "categories": "array"
+  },
+  "branding": {
+    "companyName": "string",
+    "logo": "string"
+  }
 }
 ```
 
@@ -136,5 +139,6 @@ The API routes expect the following Firestore collections:
 3. Deploy to Vercel
 4. Update widget SDK to point to new API URL
 5. Test the integration
+
 
 

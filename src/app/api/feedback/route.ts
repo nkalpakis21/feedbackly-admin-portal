@@ -10,7 +10,7 @@ export async function OPTIONS(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { apiKey, content, rating, category, metadata } = body;
+        const { apiKey, content, feedback, rating, category, metadata } = body;
 
         // Validate required fields
         if (!apiKey) {
@@ -21,7 +21,9 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(response);
         }
 
-        if (!content) {
+        // Use content or feedback field (for backward compatibility)
+        const feedbackContent = content || feedback;
+        if (!feedbackContent) {
             const response = NextResponse.json(
                 { error: 'Feedback content is required' },
                 { status: 400 }
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
 
         // Prepare feedback data
         const feedbackData = {
-            content,
+            content: feedbackContent,
             rating: rating || null,
             category: category || 'general',
             metadata: metadata || {},
