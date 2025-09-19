@@ -55,21 +55,6 @@ class ApiClient {
     }
   }
 
-  /**
-   * Get widget configuration from server
-   */
-  async getWidgetConfig() {
-    try {
-      const response = await this.makeRequest(`/api/widget/config/${this.config.websiteId}`, {
-        method: 'GET',
-      });
-
-      return response;
-    } catch (error) {
-      console.error('Failed to get widget config:', error);
-      return null;
-    }
-  }
 
   /**
    * Make HTTP request with timeout and error handling

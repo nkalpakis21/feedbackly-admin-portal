@@ -70,19 +70,6 @@ export default function TestApiPage() {
     setLoading(false);
   };
 
-  const testWidgetConfigApi = async () => {
-    setLoading(true);
-    setResult('Testing widget config API...');
-    
-    try {
-      const response = await fetch('/api/widget/config/admin-portal');
-      const data = await response.json();
-      setResult(`✅ Widget Config API Response: ${JSON.stringify(data, null, 2)}`);
-    } catch (error) {
-      setResult(`❌ Widget Config API Error: ${error}`);
-    }
-    setLoading(false);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -110,15 +97,6 @@ export default function TestApiPage() {
             </button>
           </div>
 
-          <div>
-            <button
-              onClick={testWidgetConfigApi}
-              disabled={loading}
-              className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 disabled:opacity-50"
-            >
-              Test Widget Config API
-            </button>
-          </div>
 
           {result && (
             <div className="mt-4 p-3 bg-gray-100 rounded-md">
