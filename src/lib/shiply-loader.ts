@@ -1,7 +1,4 @@
-// Dynamic Shiply SDK loader
-// Handles switching between npm package and local development
-
-import { shiplySourceConfig } from './shiply-config';
+// Shiply SDK loader - Always uses npm package
 
 export interface ShiplyInstance {
     init: (config?: Record<string, unknown>) => void;
@@ -35,28 +32,14 @@ class ShiplyLoader {
     private async loadSDKInternal(): Promise<ShiplyInstance> {
         try {
             this.isLoading = true;
-
-            if (shiplySourceConfig.useLocalSDK) {
-                console.log('🔧 Loading Shiply SDK from local development...');
-                return await this.loadLocalSDK();
-            } else {
-                console.log('📦 Loading Shiply SDK from NPM package...');
-                return await this.loadNpmSDK();
-            }
+            console.log('📦 Loading Shiply SDK from NPM package...');
+            return await this.loadNpmSDK();
         } catch (error) {
             console.error('❌ Failed to load Shiply SDK:', error);
             throw error;
         } finally {
             this.isLoading = false;
         }
-    }
-
-    private async loadLocalSDK(): Promise<ShiplyInstance> {
-        // For local development, we'll use the existing local files
-        // This assumes the local SDK files are already in the project
-        const { default: Shiply } = await import('./shiply/core/Shiply');
-        this.instance = new Shiply() as ShiplyInstance;
-        return this.instance!;
     }
 
     private async loadNpmSDK(): Promise<ShiplyInstance> {

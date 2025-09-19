@@ -1,36 +1,11 @@
 /**
  * Shiply SDK Configuration for Admin Portal
- * Supports both NPM package and local development modes
+ * Always uses NPM package
  */
-
-// Environment-based SDK source configuration
-export interface ShiplySourceConfig {
-    useLocalSDK: boolean;
-    localSDKPath?: string;
-    npmPackageVersion?: string;
-}
-
-// Environment configuration for SDK source
-const getShiplySourceConfig = (): ShiplySourceConfig => {
-    // Only use environment variable for configuration
-    const useLocalSDK = process.env.NEXT_PUBLIC_USE_LOCAL_SHIPLY_SDK === 'true';
-
-    return {
-        useLocalSDK,
-        localSDKPath: process.env.NEXT_PUBLIC_LOCAL_SHIPLY_PATH || '../shiply-sdk',
-        npmPackageVersion: process.env.NEXT_PUBLIC_SHIPLY_VERSION || '^1.2.3'
-    };
-};
-
-export const shiplySourceConfig = getShiplySourceConfig();
 
 // Log current configuration in development
 if (process.env.NODE_ENV === 'development') {
-    console.log('🔧 Shiply SDK Configuration:', {
-        useLocalSDK: shiplySourceConfig.useLocalSDK,
-        source: shiplySourceConfig.useLocalSDK ? 'Local Development' : 'NPM Package',
-        version: shiplySourceConfig.useLocalSDK ? 'Local' : shiplySourceConfig.npmPackageVersion
-    });
+    console.log('📦 Shiply SDK Configuration: Using NPM package');
 }
 
 // Widget Configuration
@@ -110,6 +85,5 @@ export const SHIPLY_EVENTS = {
 
 export type ShiplyEvent = typeof SHIPLY_EVENTS[keyof typeof SHIPLY_EVENTS];
 
-// Export both configurations for backward compatibility
-export const shiplyConfig = shiplySourceConfig;
-export default shiplySourceConfig;
+// Export the main configuration
+export default SHIPLY_CONFIG;
