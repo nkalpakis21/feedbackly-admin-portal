@@ -28,9 +28,9 @@ export async function getUserByApiKey(apiKey: string): Promise<User | null> {
 
         return {
             id: doc.id,
+            uid: data.uid,
             email: data.email,
             name: data.name,
-            website: data.website,
             createdAt: data.createdAt?.toDate() || new Date(),
             lastLogin: data.lastLogin?.toDate(),
             isActive: data.isActive,
@@ -64,9 +64,9 @@ export async function getUserById(userId: string): Promise<User | null> {
 
         return {
             id: userDoc.id,
+            uid: data.uid,
             email: data.email,
             name: data.name,
-            website: data.website,
             createdAt: data.createdAt?.toDate() || new Date(),
             lastLogin: data.lastLogin?.toDate(),
             isActive: data.isActive,
@@ -83,9 +83,9 @@ export async function getUserById(userId: string): Promise<User | null> {
  * Create user (server-side)
  */
 export async function createUser(userData: {
+    uid: string;
     email: string;
     name?: string;
-    website?: string;
     apiKey: string;
     sdkConfig: WidgetConfig;
     isActive?: boolean;

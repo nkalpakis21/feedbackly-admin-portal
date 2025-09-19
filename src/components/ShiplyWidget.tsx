@@ -48,8 +48,8 @@ interface ShiplyWidgetProps {
 }
 
 export default function ShiplyWidget({
-  apiKey: _apiKey, // Renamed to indicate it's not used
-  websiteId: _websiteId, // Renamed to indicate it's not used
+  apiKey: _apiKey, // Not used - API key is resolved from user document
+  websiteId: _websiteId, // Not used - websiteId is set to 'admin-portal'
   theme = {},
   position = {},
   size = {},
@@ -62,7 +62,6 @@ export default function ShiplyWidget({
   const { setShiplyInstance } = useShiplyContext();
   const ShiplyRef = useRef<ShiplyInstance | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [userApiKey, setUserApiKey] = useState<string | null>(null);
 
   useEffect(() => {
     // Only initialize if user is logged in
@@ -73,7 +72,6 @@ export default function ShiplyWidget({
         ShiplyRef.current = null;
         setShiplyInstance(null);
       }
-      setUserApiKey(null);
       return;
     }
 
@@ -93,7 +91,6 @@ export default function ShiplyWidget({
     const initializeShiply = async () => {
       try {
         const effectiveApiKey = await getUserApiKey();
-        setUserApiKey(effectiveApiKey);
         if (!effectiveApiKey) {
           setError('No API key found for this user');
           return;
@@ -215,9 +212,29 @@ export default function ShiplyWidget({
     }
   }, [currentUser]);
 
-  // Don't render anything if user is not logged in or there's an error
-  if (!currentUser || error) {
+  // Don't render anything if user is not logged in
+  if (!currentUser) {
     return null;
+  }
+
+  // Show error if there is one (for debugging)
+  if (error) {
+    return (
+      <div style={{ 
+        position: 'fixed', 
+        bottom: '20px', 
+        right: '20px', 
+        background: '#ff4444', 
+        color: 'white', 
+        padding: '10px', 
+        borderRadius: '5px',
+        zIndex: 10000,
+        fontSize: '12px',
+        maxWidth: '300px'
+      }}>
+        <strong>Widget Error:</strong> {error}
+      </div>
+    );
   }
 
   // The widget is rendered by the SDK itself, so we don't need to return JSX

@@ -37,6 +37,7 @@ export class UserService {
 
             // Create user document
             const userDocument = await this.userRepository.create({
+                uid: userData.uid!,
                 email: userData.email,
                 name: userData.displayName || userData.name,
                 isActive: true,
@@ -245,6 +246,7 @@ export class UserService {
     formatUserProfile(userDoc: UserDocument): UserProfile {
         return {
             id: userDoc.id,
+            uid: userDoc.uid,
             email: userDoc.email,
             name: userDoc.name,
             createdAt: userDoc.createdAt.toDate(),

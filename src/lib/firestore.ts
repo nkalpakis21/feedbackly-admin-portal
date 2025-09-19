@@ -2,7 +2,6 @@ import {
     collection,
     doc,
     getDocs,
-    getDoc,
     updateDoc,
     query,
     where,
@@ -25,14 +24,15 @@ export async function getUsers(): Promise<User[]> {
     })) as User[];
 }
 
-export async function getUser(userId: string): Promise<User | null> {
-    const docRef = doc(db, 'users', userId);
-    const docSnap = await getDoc(docRef);
+export async function getUser(uid: string): Promise<User | null> {
+    const q = query(usersCollection, where('uid', '==', uid));
+    const querySnapshot = await getDocs(q);
 
-    if (docSnap.exists()) {
-        const data = docSnap.data();
+    if (!querySnapshot.empty) {
+        const doc = querySnapshot.docs[0];
+        const data = doc.data();
         return {
-            id: docSnap.id,
+            id: doc.id,
             ...data,
             createdAt: data.createdAt?.toDate() || new Date(),
             lastLogin: data.lastLogin?.toDate(),
@@ -136,9 +136,9 @@ export async function getDefaultWebsiteIdForUser(uid: string): Promise<string | 
 export async function getUserByApiKey(apiKey: string): Promise<User | null> {
     const q = query(usersCollection, where('apiKey', '==', apiKey));
     const snapshot = await getDocs(q);
-    
+
     if (snapshot.empty) return null;
-    
+
     const doc = snapshot.docs[0];
     const data = doc.data();
     return {
