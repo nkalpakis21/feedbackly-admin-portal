@@ -169,25 +169,27 @@ function ApiSettings() {
                     <Label>Integration Code</Label>
                     <div className="bg-muted p-4 rounded-md text-sm font-mono">
                         <div className="text-green-400">{'// Install the package'}</div>
-                        <div className="text-yellow-300">npm install shiply-sdk@1.4.4</div>
-                        <div className="mt-4 text-green-400">{'// Import and use the component'}</div>
-                        <div className="text-blue-400">import ShiplyFeedback from &apos;shiply-sdk&apos;;</div>
+                        <div className="text-yellow-300">npm install shiply-sdk@1.5.1</div>
+                        <div className="mt-4 text-green-400">{'// Option 1: Provider Pattern (Recommended)'}</div>
+                        <div className="text-blue-400">import &#123; ShiplyProvider, ShiplyFeedback &#125; from &apos;shiply-sdk&apos;;</div>
                         <div className="mt-2 text-blue-400">function App() &#123;</div>
                         <div className="ml-4 text-blue-400">return (</div>
-                        <div className="ml-8 text-blue-400">&lt;ShiplyFeedback</div>
+                        <div className="ml-8 text-blue-400">&lt;ShiplyProvider</div>
                         <div className="ml-12 text-yellow-300">apiKey=&quot;sk_live_1234567890abcdef&quot;</div>
-                        <div className="ml-8 text-blue-400">/&gt;</div>
+                        <div className="ml-12 text-blue-400">websiteId=&quot;your-website&quot;</div>
+                        <div className="ml-12 text-blue-400">autoShow=&#123;true&#125;</div>
+                        <div className="ml-8 text-blue-400">&gt;</div>
+                        <div className="ml-12 text-blue-400">&lt;ShiplyFeedback /&gt;</div>
+                        <div className="ml-8 text-blue-400">&lt;/ShiplyProvider&gt;</div>
                         <div className="ml-4 text-blue-400">);</div>
                         <div className="text-blue-400">&#125;</div>
-                        <div className="mt-4 text-green-400">{'// Or with environment variable'}</div>
-                        <div className="text-blue-400">import ShiplyFeedback from &apos;shiply-sdk&apos;;</div>
-                        <div className="mt-2 text-blue-400">function App() &#123;</div>
-                        <div className="ml-4 text-blue-400">return (</div>
-                        <div className="ml-8 text-blue-400">&lt;ShiplyFeedback</div>
-                        <div className="ml-12 text-yellow-300">apiKey=&#123;process.env.SHIPLY_API_KEY&#125;</div>
-                        <div className="ml-8 text-blue-400">/&gt;</div>
-                        <div className="ml-4 text-blue-400">);</div>
-                        <div className="text-blue-400">&#125;</div>
+                        <div className="mt-4 text-green-400">{'// Option 2: Init Pattern (like Sentry)'}</div>
+                        <div className="text-blue-400">import &#123; init &#125; from &apos;shiply-sdk&apos;;</div>
+                        <div className="mt-2 text-blue-400">init(&#123;</div>
+                        <div className="ml-4 text-yellow-300">apiKey: &quot;sk_live_1234567890abcdef&quot;,</div>
+                        <div className="ml-4 text-blue-400">websiteId: &quot;your-website&quot;,</div>
+                        <div className="ml-4 text-blue-400">autoShow: true</div>
+                        <div className="text-blue-400">&#125;);</div>
                     </div>
                     <Button variant="outline" size="sm">Copy Integration Code</Button>
                 </div>

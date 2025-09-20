@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUser } from '@/lib/firestore';
 import { WidgetConfig } from '@/types';
-import ShiplyFeedback from 'shiply-sdk';
+import { ShiplyProvider, ShiplyFeedback } from 'shiply-sdk';
 
 interface ShiplyWidgetProps {
   theme?: {
@@ -127,7 +127,7 @@ export default function ShiplyWidget({
   };
 
   return (
-    <ShiplyFeedback
+    <ShiplyProvider
       apiKey={userData.apiKey}
       websiteId="admin-portal"
       theme={mergedTheme}
@@ -143,10 +143,13 @@ export default function ShiplyWidget({
         console.error('ShiplyFeedback error:', err);
         setError(err.message);
       }}
-      className={className}
-      style={style}
     >
-      {children}
-    </ShiplyFeedback>
+      <ShiplyFeedback
+        className={className}
+        style={style}
+      >
+        {children}
+      </ShiplyFeedback>
+    </ShiplyProvider>
   );
 }
