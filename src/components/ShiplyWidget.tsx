@@ -1,155 +1,91 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { getUser } from '@/lib/firestore';
-import { WidgetConfig } from '@/types';
-import { ShiplyProvider, ShiplyFeedback } from 'shiply-sdk';
+import { useEffect, useRef } from 'react';
+import { getInstance, show, hide, toggle } from 'shiply-sdk';
 
 interface ShiplyWidgetProps {
-  theme?: {
-    primaryColor?: string;
-    backgroundColor?: string;
-    textColor?: string;
-    borderColor?: string;
-    borderRadius?: string;
-    fontFamily?: string;
-    fontSize?: string;
-    headerBackgroundColor?: string;
-    footerBackgroundColor?: string;
-  };
-  position?: {
-    bottom?: string;
-    right?: string;
-  };
-  size?: {
-    width?: string;
-    height?: string;
-  };
-  autoShow?: boolean;
-  autoShowDelay?: number;
   children?: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
 }
 
+/**
+ * ShiplyWidget - Simple wrapper for init pattern
+ * The SDK is initialized at the app level in layout.tsx
+ * This component provides a trigger button to show the widget
+ */
 export default function ShiplyWidget({
-  theme = {},
-  position = {},
-  size = {},
-  autoShow = false,
-  autoShowDelay = 5000,
   children,
   className,
   style,
 }: ShiplyWidgetProps) {
-  const { currentUser } = useAuth();
-  const [userData, setUserData] = useState<{ apiKey: string; sdkConfig: WidgetConfig } | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Only fetch user data if user is logged in
-    if (!currentUser) {
-      setUserData(null);
-      setError(null);
-      return;
+  // Show feedback widget
+  const showFeedback = () => {
+    console.log('🔍 ShiplyWidget: showFeedback called');
+    const instance = getInstance();
+    console.log('🔍 ShiplyWidget: getInstance() returned:', instance);
+    
+    if (instance) {
+      console.log('🔍 ShiplyWidget: Calling show()...');
+      show();
+    } else {
+      console.warn('❌ Shiply SDK not initialized. Make sure init() was called.');
+      console.log('🔍 Available global functions:', { getInstance, show, hide, toggle });
     }
+  };
 
-    // Get user's API key and SDK config from their user document
-    const fetchUserData = async () => {
-      try {
-        const userDoc = await getUser(currentUser.uid);
-        console.log('🔍 Debug: User document:', userDoc);
-        
-        if (!userDoc?.apiKey || !userDoc?.sdkConfig) {
-          setError('No user data found (API key or SDK config missing)');
-          return;
-        }
-
-        setUserData({
-          apiKey: userDoc.apiKey,
-          sdkConfig: userDoc.sdkConfig
-        });
-        setError(null);
-      } catch (error) {
-        console.error('Error getting user data:', error);
-        setError('Failed to load user configuration');
-      }
-    };
-
-    fetchUserData();
-  }, [currentUser]);
-
-  // Don't render anything if user is not logged in
-  if (!currentUser) {
-    return null;
-  }
-
-  // Show error if there is one
-  if (error) {
+  // If custom children provided, clone them with onClick handler
+  if (children) {
     return (
-      <div style={{ 
-        position: 'fixed', 
-        bottom: '20px', 
-        right: '20px', 
-        background: '#ff4444', 
-        color: 'white', 
-        padding: '10px', 
-        borderRadius: '5px',
-        zIndex: 10000,
-        fontSize: '12px',
-        maxWidth: '300px'
-      }}>
-        <strong>Widget Error:</strong> {error}
+      <div
+        ref={containerRef}
+        className={className}
+        style={style}
+        onClick={showFeedback}
+      >
+        {children}
       </div>
     );
   }
 
-  // Don't render if we don't have user data yet
-  if (!userData) {
-    return null;
-  }
-
-  // Merge user's SDK config with any passed props
-  const mergedTheme = {
-    ...userData.sdkConfig.theme,
-    ...theme,
-  };
-
-  const mergedPosition = {
-    ...userData.sdkConfig.position,
-    ...position,
-  };
-
-  const mergedSize = {
-    ...userData.sdkConfig.size,
-    ...size,
-  };
-
+  // Default trigger button
   return (
-    <ShiplyProvider
-      apiKey={userData.apiKey}
-      websiteId="admin-portal"
-      theme={mergedTheme}
-      position={mergedPosition}
-      size={mergedSize}
-      autoShow={autoShow}
-      autoShowDelay={autoShowDelay}
-      onFeedbackSubmit={(feedbackData) => {
-        console.log('Feedback submitted:', feedbackData);
-        // You can add additional handling here if needed
-      }}
-      onError={(err) => {
-        console.error('ShiplyFeedback error:', err);
-        setError(err.message);
-      }}
+    <div
+      ref={containerRef}
+      className={className}
+      style={style}
     >
-      <ShiplyFeedback
-        className={className}
-        style={style}
+      <button
+        onClick={showFeedback}
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '50%',
+          width: '60px',
+          height: '60px',
+          fontSize: '24px',
+          cursor: 'pointer',
+          boxShadow: '0 4px 12px rgba(0, 123, 255, 0.3)',
+          zIndex: 9999,
+          transition: 'all 0.2s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#0056b3';
+          e.currentTarget.style.transform = 'scale(1.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#007bff';
+          e.currentTarget.style.transform = 'scale(1)';
+        }}
       >
-        {children}
-      </ShiplyFeedback>
-    </ShiplyProvider>
+        💬
+      </button>
+    </div>
   );
 }

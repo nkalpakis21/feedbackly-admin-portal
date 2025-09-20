@@ -3,21 +3,12 @@
 import { useEffect } from 'react';
 import DashboardStats from '@/components/DashboardStats';
 import RecentFeedback from '@/components/RecentFeedback';
-import { useShiply } from '@/hooks/useShiply';
-import { SHIPLY_EVENTS } from '@/lib/shiply-config';
+// Removed useShiply hook and SHIPLY_EVENTS - using init pattern now
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 export default function DashboardPage() {
-  const { trackEvent } = useShiply();
-
-  useEffect(() => {
-    // Track dashboard page view
-    trackEvent(SHIPLY_EVENTS.DASHBOARD_VIEWED, {
-      page: 'dashboard',
-      timestamp: new Date().toISOString(),
-    });
-  }, [trackEvent]);
+  // SDK is initialized at app level, no need for tracking here
 
   return (
     <div className="space-y-6">
