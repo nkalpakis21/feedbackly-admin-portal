@@ -7,6 +7,7 @@ import { useShiply } from '@/hooks/useShiply';
 import { SHIPLY_EVENTS } from '@/lib/shiply-config';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import ShiplyLogo from '@/components/ShiplyLogo';
 
 export default function DashboardPage() {
   const { trackEvent } = useShiply();

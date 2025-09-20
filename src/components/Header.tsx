@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import ShiplyLogo from './ShiplyLogo';
 
 export default function Header() {
   const { currentUser, logout } = useAuth();
@@ -21,9 +22,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-6">
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-foreground">
-              Shiply Admin Portal
-            </h1>
+            <ShiplyLogo size="lg" className="text-blue-600" />
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-muted-foreground">

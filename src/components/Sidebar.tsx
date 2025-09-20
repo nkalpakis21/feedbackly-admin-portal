@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import ShiplyLogo from './ShiplyLogo';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: '📊' },
@@ -16,8 +17,8 @@ export default function Sidebar() {
   return (
     <div className="hidden md:flex md:w-64 md:flex-col p-4">
       <div className="flex flex-col flex-grow pt-5 bg-card rounded-lg border border-border overflow-y-auto shadow-sm">
-        <div className="flex items-center flex-shrink-0 px-4">
-          <h2 className="text-lg font-semibold text-foreground">Navigation</h2>
+        <div className="flex items-center flex-shrink-0 px-4 pb-4 border-b border-border">
+          <ShiplyLogo size="md" className="text-blue-600" />
         </div>
         <div className="mt-5 flex-grow flex flex-col">
           <nav className="flex-1 px-2 pb-4 space-y-1">
