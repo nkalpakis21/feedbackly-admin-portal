@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getAnalytics } from '@/lib/firestore';
 import { Analytics } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function AnalyticsPage() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
@@ -53,171 +54,180 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
+        <p className="text-muted-foreground">
           Detailed insights and analytics for your platform
         </p>
       </div>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">💬</span>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex-shrink-0">
+                  <span className="text-2xl">💬</span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
                     Total Feedback
-                  </dt>
-                  <dd className="text-lg font-medium text-green-600">
+                  </p>
+                  <p className="text-2xl font-bold text-chart-1">
                     {analytics.totalFeedback}
-                  </dd>
-                </dl>
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              +20.1% from last month
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">⭐</span>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex-shrink-0">
+                  <span className="text-2xl">⭐</span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
                     Average Rating
-                  </dt>
-                  <dd className="text-lg font-medium text-yellow-600">
+                  </p>
+                  <p className="text-2xl font-bold text-chart-4">
                     {analytics.averageRating}
-                  </dd>
-                </dl>
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              +0.3 from last month
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">✅</span>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Processed
-                  </dt>
-                  <dd className="text-lg font-medium text-purple-600">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex-shrink-0">
+                  <span className="text-2xl">✅</span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Processed Feedback
+                  </p>
+                  <p className="text-2xl font-bold text-chart-2">
                     {analytics.recentActivity.processedFeedback}
-                  </dd>
-                </dl>
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              +12.5% from last month
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Detailed Analytics */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Sentiment Distribution */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Sentiment Distribution
-            </h3>
+        <Card>
+          <CardHeader>
+            <CardTitle>Sentiment Distribution</CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">Positive</span>
+                <span className="text-sm font-medium">Positive</span>
                 <div className="flex items-center">
-                  <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                  <div className="w-32 bg-muted rounded-full h-2 mr-3">
                     <div
-                      className="bg-green-600 h-2 rounded-full"
+                      className="bg-chart-1 h-2 rounded-full"
                       style={{
                         width: `${(analytics.sentimentDistribution.positive / analytics.totalFeedback) * 100}%`,
                       }}
                     ></div>
                   </div>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-muted-foreground">
                     {analytics.sentimentDistribution.positive}
                   </span>
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">Neutral</span>
+                <span className="text-sm font-medium">Neutral</span>
                 <div className="flex items-center">
-                  <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                  <div className="w-32 bg-muted rounded-full h-2 mr-3">
                     <div
-                      className="bg-gray-600 h-2 rounded-full"
+                      className="bg-chart-4 h-2 rounded-full"
                       style={{
                         width: `${(analytics.sentimentDistribution.neutral / analytics.totalFeedback) * 100}%`,
                       }}
                     ></div>
                   </div>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-muted-foreground">
                     {analytics.sentimentDistribution.neutral}
                   </span>
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">Negative</span>
+                <span className="text-sm font-medium">Negative</span>
                 <div className="flex items-center">
-                  <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                  <div className="w-32 bg-muted rounded-full h-2 mr-3">
                     <div
-                      className="bg-red-600 h-2 rounded-full"
+                      className="bg-chart-3 h-2 rounded-full"
                       style={{
                         width: `${(analytics.sentimentDistribution.negative / analytics.totalFeedback) * 100}%`,
                       }}
                     ></div>
                   </div>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-muted-foreground">
                     {analytics.sentimentDistribution.negative}
                   </span>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Recent Activity */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Recent Activity (7 days)
-            </h3>
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity (7 days)</CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">New Feedback</span>
-                <span className="text-lg font-semibold text-green-600">
+                <span className="text-sm font-medium">New Feedback</span>
+                <span className="text-lg font-semibold text-chart-1">
                   {analytics.recentActivity.newFeedback}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">Processed Feedback</span>
-                <span className="text-lg font-semibold text-purple-600">
+                <span className="text-sm font-medium">Processed Feedback</span>
+                <span className="text-lg font-semibold text-chart-2">
                   {analytics.recentActivity.processedFeedback}
                 </span>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Feedback by Category */}
       {Object.keys(analytics.feedbackByCategory).length > 0 && (
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Feedback by Category
-            </h3>
+        <Card>
+          <CardHeader>
+            <CardTitle>Feedback by Category</CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Object.entries(analytics.feedbackByCategory).map(([category, count]) => (
-                <div key={category} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700 capitalize">
+                <div key={category} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <span className="text-sm font-medium capitalize">
                     {category}
                   </span>
                   <span className="text-lg font-semibold text-gray-900">
@@ -226,8 +236,8 @@ export default function AnalyticsPage() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

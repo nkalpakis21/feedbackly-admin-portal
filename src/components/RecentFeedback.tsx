@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { getRecentFeedback } from '@/lib/firestore';
 import { Feedback } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export default function RecentFeedback() {
   const [feedback, setFeedback] = useState<Feedback[]>([]);
@@ -23,14 +25,14 @@ export default function RecentFeedback() {
     fetchFeedback();
   }, []);
 
-  const getSentimentColor = (sentiment?: string) => {
+  const getSentimentVariant = (sentiment?: string) => {
     switch (sentiment) {
       case 'positive':
-        return 'text-green-600 bg-green-100';
+        return 'default';
       case 'negative':
-        return 'text-red-600 bg-red-100';
+        return 'destructive';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return 'secondary';
     }
   };
 
@@ -45,36 +47,36 @@ export default function RecentFeedback() {
 
   if (loading) {
     return (
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-            Recent Feedback
-          </h3>
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Feedback</CardTitle>
+        </CardHeader>
+        <CardContent>
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                <div className="h-3 bg-muted rounded w-1/2"></div>
               </div>
             ))}
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="bg-white shadow rounded-lg">
-      <div className="px-4 py-5 sm:p-6">
-        <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-          Recent Feedback
-        </h3>
+    <Card>
+      <CardHeader>
+        <CardTitle>Recent Feedback</CardTitle>
+      </CardHeader>
+      <CardContent>
         <div className="space-y-4">
           {feedback.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">No feedback yet</p>
+            <p className="text-muted-foreground text-center py-4">No feedback yet</p>
           ) : (
             feedback.map((item) => (
-              <div key={item.id} className="border-l-4 border-blue-400 pl-4">
+              <div key={item.id} className="border-l-4 pl-4" style={{ borderLeftColor: '#3b82f6' }}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-2">
                     {item.rating && (
@@ -83,32 +85,28 @@ export default function RecentFeedback() {
                       </span>
                     )}
                     {item.sentiment && (
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSentimentColor(
-                          item.sentiment
-                        )}`}
-                      >
+                      <Badge variant={getSentimentVariant(item.sentiment)}>
                         {item.sentiment}
-                      </span>
+                      </Badge>
                     )}
                   </div>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-muted-foreground">
                     {formatDate(item.createdAt)}
                   </span>
                 </div>
-                <p className="text-gray-700 text-sm line-clamp-2">
+                <p className="text-foreground text-sm line-clamp-2">
                   {item.content}
                 </p>
                 {item.category && (
-                  <span className="inline-block mt-2 text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                  <Badge variant="outline" className="mt-2">
                     {item.category}
-                  </span>
+                  </Badge>
                 )}
               </div>
             ))
           )}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

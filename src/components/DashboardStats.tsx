@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { getAnalytics } from '@/lib/firestore';
 import { Analytics } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 export default function DashboardStats() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
@@ -25,14 +27,14 @@ export default function DashboardStats() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-white overflow-hidden shadow rounded-lg animate-pulse">
-            <div className="p-5">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-            </div>
-          </div>
+          <Card key={i} className="animate-pulse">
+            <CardContent className="p-6">
+              <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+              <div className="h-8 bg-muted rounded w-1/2"></div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     );
@@ -42,49 +44,81 @@ export default function DashboardStats() {
     return <div>Error loading analytics</div>;
   }
 
+  // Sample chart data
+  const chartData = [
+    { name: 'Jan', value: 400 },
+    { name: 'Feb', value: 300 },
+    { name: 'Mar', value: 600 },
+    { name: 'Apr', value: 800 },
+    { name: 'May', value: 500 },
+    { name: 'Jun', value: 700 },
+  ];
+
   const stats = [
     {
       name: 'Total Feedback',
       value: analytics.totalFeedback,
+      change: '+20.1% from last month',
       icon: '💬',
-      color: 'text-green-600',
+      color: 'text-chart-1',
+      chartColor: 'hsl(var(--chart-1))',
     },
     {
       name: 'Average Rating',
       value: analytics.averageRating.toFixed(1),
+      change: '+0.3 from last month',
       icon: '⭐',
-      color: 'text-yellow-600',
+      color: 'text-chart-4',
+      chartColor: 'hsl(var(--chart-4))',
     },
     {
       name: 'Processed Feedback',
       value: analytics.recentActivity.processedFeedback,
+      change: '+12.5% from last month',
       icon: '✅',
-      color: 'text-purple-600',
+      color: 'text-chart-2',
+      chartColor: 'hsl(var(--chart-2))',
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {stats.map((stat) => (
-        <div key={stat.name} className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">{stat.icon}</span>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
+        <Card key={stat.name}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex-shrink-0">
+                  <span className="text-2xl">{stat.icon}</span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
                     {stat.name}
-                  </dt>
-                  <dd className={`text-lg font-medium ${stat.color}`}>
+                  </p>
+                  <p className={`text-2xl font-bold ${stat.color}`}>
                     {stat.value}
-                  </dd>
-                </dl>
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {stat.change}
+            </p>
+            <div className="mt-4 h-16">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData}>
+                  <Line 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke={stat.chartColor}
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
       ))}
     </div>
   );

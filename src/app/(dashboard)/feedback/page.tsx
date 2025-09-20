@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { getFeedback } from '@/lib/firestore';
 import { Feedback } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export default function FeedbackPage() {
   const [feedback, setFeedback] = useState<Feedback[]>([]);
@@ -23,27 +25,27 @@ export default function FeedbackPage() {
     fetchFeedback();
   }, []);
 
-  const getSentimentColor = (sentiment?: string) => {
+  const getSentimentVariant = (sentiment?: string) => {
     switch (sentiment) {
       case 'positive':
-        return 'text-green-600 bg-green-100';
+        return 'default';
       case 'negative':
-        return 'text-red-600 bg-red-100';
+        return 'destructive';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return 'secondary';
     }
   };
 
-  const getPriorityColor = (priority?: string) => {
+  const getPriorityVariant = (priority?: string) => {
     switch (priority) {
       case 'high':
-        return 'text-red-600 bg-red-100';
+        return 'destructive';
       case 'medium':
-        return 'text-yellow-600 bg-yellow-100';
+        return 'secondary';
       case 'low':
-        return 'text-green-600 bg-green-100';
+        return 'default';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return 'outline';
     }
   };
 
@@ -61,20 +63,20 @@ export default function FeedbackPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Feedback</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-3xl font-bold tracking-tight">Feedback</h1>
+          <p className="text-muted-foreground">
             View and manage user feedback
           </p>
         </div>
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
+        <Card>
+          <CardContent className="pt-6">
             <div className="animate-pulse space-y-4">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-20 bg-gray-200 rounded"></div>
+                <div key={i} className="h-20 bg-muted rounded"></div>
               ))}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -82,92 +84,81 @@ export default function FeedbackPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Feedback</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-3xl font-bold tracking-tight">Feedback</h1>
+        <p className="text-muted-foreground">
           View and manage user feedback
         </p>
       </div>
 
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
+      <Card>
+        <CardContent className="pt-6">
           <div className="space-y-6">
             {feedback.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No feedback yet</p>
+              <p className="text-muted-foreground text-center py-8">No feedback yet</p>
             ) : (
               feedback.map((item) => (
-                <div key={item.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                      {item.rating && (
-                        <span className="text-lg">
-                          {item.rating === 1 ? '😞' : item.rating === 2 ? '😐' : item.rating === 3 ? '😍' : '⭐'.repeat(item.rating)}
-                        </span>
-                      )}
-                      {item.sentiment && (
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSentimentColor(
-                            item.sentiment
-                          )}`}
-                        >
-                          {item.sentiment}
-                        </span>
-                      )}
-                      {item.aiAnalysis?.priority && (
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(
-                            item.aiAnalysis.priority
-                          )}`}
-                        >
-                          {item.aiAnalysis.priority} priority
-                        </span>
-                      )}
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          item.processed
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}
-                      >
-                        {item.processed ? 'Processed' : 'Pending'}
+                <Card key={item.id} className="border">
+                  <CardContent className="pt-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        {item.rating && (
+                          <span className="text-lg">
+                            {item.rating === 1 ? '😞' : item.rating === 2 ? '😐' : item.rating === 3 ? '😍' : '⭐'.repeat(item.rating)}
+                          </span>
+                        )}
+                        {item.sentiment && (
+                          <Badge variant={getSentimentVariant(item.sentiment)}>
+                            {item.sentiment}
+                          </Badge>
+                        )}
+                        {item.aiAnalysis?.priority && (
+                          <Badge variant={getPriorityVariant(item.aiAnalysis.priority)}>
+                            {item.aiAnalysis.priority} priority
+                          </Badge>
+                        )}
+                        <Badge variant={item.processed ? 'default' : 'secondary'}>
+                          {item.processed ? 'Processed' : 'Pending'}
+                        </Badge>
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        {formatDate(item.createdAt)}
                       </span>
                     </div>
-                    <span className="text-sm text-gray-500">
-                      {formatDate(item.createdAt)}
-                    </span>
-                  </div>
-                  
-                  <p className="text-gray-700 mb-3">{item.content}</p>
-                  
-                  {item.category && (
-                    <span className="inline-block text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded mr-2">
-                      {item.category}
-                    </span>
-                  )}
-                  
-                  {item.aiAnalysis && (
-                    <div className="mt-3 p-3 bg-gray-50 rounded-md">
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">AI Analysis</h4>
-                      <p className="text-sm text-gray-700 mb-2">{item.aiAnalysis.summary}</p>
-                      {item.aiAnalysis.keywords.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {item.aiAnalysis.keywords.map((keyword, index) => (
-                            <span
-                              key={index}
-                              className="inline-block text-xs text-gray-600 bg-white px-2 py-1 rounded border"
-                            >
-                              {keyword}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                    
+                    <p className="text-foreground mb-3">{item.content}</p>
+                    
+                    {item.category && (
+                      <Badge variant="outline" className="mr-2">
+                        {item.category}
+                      </Badge>
+                    )}
+                    
+                    {item.aiAnalysis && (
+                      <div className="mt-3 p-3 bg-muted rounded-md">
+                        <h4 className="text-sm font-medium mb-2">AI Analysis</h4>
+                        <p className="text-sm text-muted-foreground mb-2">{item.aiAnalysis.summary}</p>
+                        {item.aiAnalysis.keywords.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {item.aiAnalysis.keywords.map((keyword, index) => (
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                {keyword}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               ))
             )}
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
