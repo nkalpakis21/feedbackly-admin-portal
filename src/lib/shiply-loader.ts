@@ -45,7 +45,12 @@ class ShiplyLoader {
     private async loadNpmSDK(): Promise<ShiplyInstance> {
         // Load from npm package
         const ShiplyModule = await import('shiply-sdk');
-        const Shiply = (ShiplyModule as Record<string, unknown>).Shiply || (ShiplyModule as Record<string, unknown>).default;
+        const Shiply = (ShiplyModule as Record<string, unknown>).Shiply;
+        
+        if (!Shiply) {
+            throw new Error('Shiply class not found in shiply-sdk package');
+        }
+        
         this.instance = new (Shiply as new () => ShiplyInstance)() as ShiplyInstance;
         return this.instance!;
     }
