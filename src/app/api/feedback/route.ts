@@ -8,6 +8,7 @@ export async function OPTIONS(_request: NextRequest) { // eslint-disable-line @t
 }
 
 export async function POST(request: NextRequest) {
+    console.log('🔍 Debug: POST request received');
     try {
         const body = await request.json();
         const { apiKey, content, rating, category, metadata } = body;

@@ -25,8 +25,8 @@ export default function DashboardStats() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {[...Array(4)].map((_, i) => (
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {[...Array(3)].map((_, i) => (
           <div key={i} className="bg-white overflow-hidden shadow rounded-lg animate-pulse">
             <div className="p-5">
               <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
@@ -43,12 +43,6 @@ export default function DashboardStats() {
   }
 
   const stats = [
-    {
-      name: 'Total Users',
-      value: analytics.totalUsers,
-      icon: '👥',
-      color: 'text-blue-600',
-    },
     {
       name: 'Total Feedback',
       value: analytics.totalFeedback,
@@ -70,7 +64,7 @@ export default function DashboardStats() {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {stats.map((stat) => (
         <div key={stat.name} className="bg-white overflow-hidden shadow rounded-lg">
           <div className="p-5">

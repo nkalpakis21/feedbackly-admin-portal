@@ -81,6 +81,7 @@ export default function ShiplyWidget({
       if (!currentUser) return null;
       try {
         const userDoc = await getUser(currentUser.uid);
+        console.log('🔍 Debug: User document:', userDoc);
         if (!userDoc?.apiKey || !userDoc?.sdkConfig) return null;
         return {
           apiKey: userDoc.apiKey,
@@ -108,6 +109,7 @@ export default function ShiplyWidget({
         Shiply.init({
           apiKey: userData.apiKey,
           websiteId: 'admin-portal', // Keep for SDK compatibility, but not used for config fetching
+          apiUrl: process.env.NEXT_PUBLIC_SHIPLY_API_URL || '', // Use environment variable for API base URL
           theme: {
             ...userData.sdkConfig.theme,
             ...theme,

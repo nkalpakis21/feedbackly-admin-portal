@@ -37,15 +37,6 @@ export default function DashboardPage() {
               Quick Actions
             </h3>
             <div className="space-y-3">
-              <button className="w-full text-left px-4 py-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
-                <div className="flex items-center">
-                  <span className="text-lg mr-3">👥</span>
-                  <div>
-                    <div className="font-medium text-gray-900">View All Users</div>
-                    <div className="text-sm text-gray-500">Manage user accounts</div>
-                  </div>
-                </div>
-              </button>
               
               <button className="w-full text-left px-4 py-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
                 <div className="flex items-center">

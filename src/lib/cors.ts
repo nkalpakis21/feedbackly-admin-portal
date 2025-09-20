@@ -24,6 +24,7 @@ export function addCorsHeaders(response: NextResponse, origin?: string | null): 
 }
 
 export function handleCorsPreflight(): NextResponse {
+    console.log('🔍 Debug: Handling CORS preflight request');
     const response = new NextResponse(null, { status: 200 });
     return addCorsHeaders(response);
 }
