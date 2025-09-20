@@ -9,6 +9,14 @@ interface ShiplyWidgetProps {
   style?: React.CSSProperties;
 }
 
+// Extended interface for debugging purposes
+interface ShiplyInstanceWithWidget {
+  widget?: {
+    widgetElement?: HTMLElement;
+    isVisible?: boolean;
+  };
+}
+
 /**
  * ShiplyWidget - Simple wrapper for init pattern
  * The SDK is initialized at the app level in layout.tsx
@@ -29,16 +37,17 @@ export default function ShiplyWidget({
     
     if (instance) {
       console.log('🔍 ShiplyWidget: Calling show()...');
-      console.log('🔍 ShiplyWidget: Widget element before show:', (instance as any).widget?.widgetElement);
-      console.log('🔍 ShiplyWidget: Widget isVisible before show:', (instance as any).widget?.isVisible);
+      const instanceWithWidget = instance as unknown as ShiplyInstanceWithWidget;
+      console.log('🔍 ShiplyWidget: Widget element before show:', instanceWithWidget.widget?.widgetElement);
+      console.log('🔍 ShiplyWidget: Widget isVisible before show:', instanceWithWidget.widget?.isVisible);
       
       show();
       
       // Check after show and force if needed
       setTimeout(() => {
-        console.log('🔍 ShiplyWidget: Widget element after show:', (instance as any).widget?.widgetElement);
-        console.log('🔍 ShiplyWidget: Widget isVisible after show:', (instance as any).widget?.isVisible);
-        console.log('🔍 ShiplyWidget: Widget element display style:', (instance as any).widget?.widgetElement?.style?.display);
+        console.log('🔍 ShiplyWidget: Widget element after show:', instanceWithWidget.widget?.widgetElement);
+        console.log('🔍 ShiplyWidget: Widget isVisible after show:', instanceWithWidget.widget?.isVisible);
+        console.log('🔍 ShiplyWidget: Widget element display style:', instanceWithWidget.widget?.widgetElement?.style?.display);
         
         // Force the widget to be visible if it's still not showing
         const widget = document.querySelector('#Shiply-widget') as HTMLElement;
