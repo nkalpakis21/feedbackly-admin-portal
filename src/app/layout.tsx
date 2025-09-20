@@ -1,6 +1,6 @@
 'use client';
 
-import type { Metadata } from "next";
+// Removed Metadata import - not needed for client component
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";

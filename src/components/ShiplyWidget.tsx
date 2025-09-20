@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { getInstance, show, hide, toggle } from 'shiply-sdk';
 
 interface ShiplyWidgetProps {
@@ -29,7 +29,25 @@ export default function ShiplyWidget({
     
     if (instance) {
       console.log('🔍 ShiplyWidget: Calling show()...');
+      console.log('🔍 ShiplyWidget: Widget element before show:', (instance as any).widget?.widgetElement);
+      console.log('🔍 ShiplyWidget: Widget isVisible before show:', (instance as any).widget?.isVisible);
+      
       show();
+      
+      // Check after show and force if needed
+      setTimeout(() => {
+        console.log('🔍 ShiplyWidget: Widget element after show:', (instance as any).widget?.widgetElement);
+        console.log('🔍 ShiplyWidget: Widget isVisible after show:', (instance as any).widget?.isVisible);
+        console.log('🔍 ShiplyWidget: Widget element display style:', (instance as any).widget?.widgetElement?.style?.display);
+        
+        // Force the widget to be visible if it's still not showing
+        const widget = document.querySelector('#Shiply-widget') as HTMLElement;
+        if (widget && widget.style.display !== 'block') {
+          console.log('🔧 ShiplyWidget: Forcing widget to be visible...');
+          widget.style.setProperty('display', 'block', 'important');
+          console.log('✅ ShiplyWidget: Widget forced to be visible');
+        }
+      }, 100);
     } else {
       console.warn('❌ Shiply SDK not initialized. Make sure init() was called.');
       console.log('🔍 Available global functions:', { getInstance, show, hide, toggle });

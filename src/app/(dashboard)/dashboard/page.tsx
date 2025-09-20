@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+// Removed useEffect import - not needed with init pattern
 import DashboardStats from '@/components/DashboardStats';
 import RecentFeedback from '@/components/RecentFeedback';
 // Removed useShiply hook and SHIPLY_EVENTS - using init pattern now

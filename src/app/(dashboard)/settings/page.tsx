@@ -179,9 +179,9 @@ function ApiSettings() {
                         <div className="text-blue-400">&#125;);</div>
                         <div className="mt-4 text-green-400">{'// Use global functions to control widget'}</div>
                         <div className="text-blue-400">import &#123; show, hide, toggle &#125; from &apos;shiply-sdk&apos;;</div>
-                        <div className="mt-2 text-blue-400">// show(); // Show the widget</div>
-                        <div className="text-blue-400">// hide(); // Hide the widget</div>
-                        <div className="text-blue-400">// toggle(); // Toggle the widget</div>
+                        <div className="mt-2 text-blue-400">{'// show(); // Show the widget'}</div>
+                        <div className="text-blue-400">{'// hide(); // Hide the widget'}</div>
+                        <div className="text-blue-400">{'// toggle(); // Toggle the widget'}</div>
                     </div>
                     <Button variant="outline" size="sm">Copy Integration Code</Button>
                 </div>
