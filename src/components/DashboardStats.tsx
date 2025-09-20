@@ -62,6 +62,7 @@ export default function DashboardStats() {
       icon: '💬',
       color: 'text-chart-1',
       chartColor: 'hsl(var(--chart-1))',
+      borderColor: '#3b82f6', // Blue
     },
     {
       name: 'Average Rating',
@@ -70,6 +71,7 @@ export default function DashboardStats() {
       icon: '⭐',
       color: 'text-chart-4',
       chartColor: 'hsl(var(--chart-4))',
+      borderColor: '#f59e0b', // Amber
     },
     {
       name: 'Processed Feedback',
@@ -78,13 +80,14 @@ export default function DashboardStats() {
       icon: '✅',
       color: 'text-chart-2',
       chartColor: 'hsl(var(--chart-2))',
+      borderColor: '#10b981', // Emerald
     },
   ];
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {stats.map((stat) => (
-        <Card key={stat.name}>
+        <Card key={stat.name} style={{ borderLeftColor: stat.borderColor, borderLeftWidth: '4px' }}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">

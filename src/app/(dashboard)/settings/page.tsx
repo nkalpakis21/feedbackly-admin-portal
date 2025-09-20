@@ -29,7 +29,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Section Navigation */}
-            <Card>
+            <Card style={{ borderLeftColor: '#6366f1', borderLeftWidth: '4px' }}>
                 <CardHeader>
                     <div className="flex space-x-8">
                         {sections.map((section) => (

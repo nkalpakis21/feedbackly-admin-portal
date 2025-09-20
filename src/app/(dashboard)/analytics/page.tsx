@@ -28,19 +28,21 @@ export default function AnalyticsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Detailed insights and analytics for your platform
           </p>
         </div>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white shadow rounded-lg p-6">
-              <div className="animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-              </div>
-            </div>
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="animate-pulse">
+                  <div className="h-4 bg-muted rounded w-3/4 mb-4"></div>
+                  <div className="h-8 bg-muted rounded w-1/2"></div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
@@ -62,7 +64,7 @@ export default function AnalyticsPage() {
 
       {/* Overview Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card>
+        <Card style={{ borderLeftColor: '#3b82f6', borderLeftWidth: '4px' }}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -85,7 +87,7 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card style={{ borderLeftColor: '#f59e0b', borderLeftWidth: '4px' }}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -108,7 +110,7 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card style={{ borderLeftColor: '#10b981', borderLeftWidth: '4px' }}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -135,7 +137,7 @@ export default function AnalyticsPage() {
       {/* Detailed Analytics */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Sentiment Distribution */}
-        <Card>
+        <Card style={{ borderLeftColor: '#ef4444', borderLeftWidth: '4px' }}>
           <CardHeader>
             <CardTitle>Sentiment Distribution</CardTitle>
           </CardHeader>
@@ -194,7 +196,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Recent Activity */}
-        <Card>
+        <Card style={{ borderLeftColor: '#06b6d4', borderLeftWidth: '4px' }}>
           <CardHeader>
             <CardTitle>Recent Activity (7 days)</CardTitle>
           </CardHeader>
@@ -219,7 +221,7 @@ export default function AnalyticsPage() {
 
       {/* Feedback by Category */}
       {Object.keys(analytics.feedbackByCategory).length > 0 && (
-        <Card>
+        <Card style={{ borderLeftColor: '#8b5cf6', borderLeftWidth: '4px' }}>
           <CardHeader>
             <CardTitle>Feedback by Category</CardTitle>
           </CardHeader>

@@ -76,7 +76,7 @@ export default function RecentFeedback() {
             <p className="text-muted-foreground text-center py-4">No feedback yet</p>
           ) : (
             feedback.map((item) => (
-              <div key={item.id} className="border-l-4 pl-4" style={{ borderLeftColor: '#3b82f6' }}>
+              <div key={item.id} className="border-l-4 pl-4" style={{ borderLeftColor: '#8b5cf6' }}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-2">
                     {item.rating && (

@@ -14,8 +14,8 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="hidden md:flex md:w-64 md:flex-col">
-      <div className="flex flex-col flex-grow pt-5 bg-background border-r border-border overflow-y-auto">
+    <div className="hidden md:flex md:w-64 md:flex-col p-4">
+      <div className="flex flex-col flex-grow pt-5 bg-card rounded-lg border border-border overflow-y-auto shadow-sm">
         <div className="flex items-center flex-shrink-0 px-4">
           <h2 className="text-lg font-semibold text-foreground">Navigation</h2>
         </div>

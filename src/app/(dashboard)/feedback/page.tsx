@@ -90,7 +90,7 @@ export default function FeedbackPage() {
         </p>
       </div>
 
-      <Card>
+      <Card style={{ borderLeftColor: '#f97316', borderLeftWidth: '4px' }}>
         <CardContent className="pt-6">
           <div className="space-y-6">
             {feedback.length === 0 ? (
