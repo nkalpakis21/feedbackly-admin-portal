@@ -254,6 +254,8 @@ export class UserService {
             isActive: userDoc.isActive,
             apiKey: userDoc.apiKey,
             sdkConfig: userDoc.sdkConfig,
+            platformName: userDoc.platformName,
+            communicationEmail: userDoc.communicationEmail,
         };
     }
 
