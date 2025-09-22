@@ -17,7 +17,7 @@ export default function SettingsPage() {
         { id: 'general', name: 'General Settings', icon: '⚙️' },
         // { id: 'widget', name: 'Widget Configuration', icon: '🔧' },
         { id: 'api', name: 'API Keys', icon: '🔑' },
-        { id: 'billing', name: 'Billing', icon: '💳' },
+        // { id: 'billing', name: 'Billing', icon: '💳' },
     ];
 
     return (
