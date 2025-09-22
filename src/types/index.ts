@@ -14,7 +14,7 @@ export interface User {
     sdkConfig: WidgetConfig;  // User's widget configuration
     
     // NEW: General settings
-    platformName?: string;    // User's platform/company name
+    websiteName?: string;     // User's website name
     communicationEmail?: string; // Email for communications (can be different from login email)
 }
 
@@ -34,7 +34,7 @@ export interface UserDocument {
     sdkConfig: WidgetConfig;  // User's widget configuration
     
     // NEW: General settings
-    platformName?: string;    // User's platform/company name
+    websiteName?: string;     // User's website name
     communicationEmail?: string; // Email for communications (can be different from login email)
 }
 
@@ -54,7 +54,7 @@ export interface UpdateUserRequest {
     website?: string;
     isActive?: boolean;
     role?: 'admin' | 'user';
-    platformName?: string;
+    websiteName?: string;
     communicationEmail?: string;
 }
 
@@ -72,7 +72,7 @@ export interface UserProfile {
     sdkConfig: WidgetConfig;  // User's widget configuration
     
     // NEW: General settings
-    platformName?: string;    // User's platform/company name
+    websiteName?: string;     // User's website name
     communicationEmail?: string; // Email for communications (can be different from login email)
 }
 

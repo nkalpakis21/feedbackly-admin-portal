@@ -62,7 +62,7 @@ export default function SettingsPage() {
 
 function GeneralSettings() {
     const { currentUser } = useAuth();
-    const [platformName, setPlatformName] = useState('');
+    const [websiteName, setWebsiteName] = useState('');
     const [communicationEmail, setCommunicationEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -75,7 +75,7 @@ function GeneralSettings() {
             try {
                 const userDoc = await getUser(currentUser.uid);
                 if (userDoc) {
-                    setPlatformName(userDoc.platformName || '');
+                    setWebsiteName(userDoc.websiteName || '');
                     setCommunicationEmail(userDoc.communicationEmail || '');
                 }
             } catch (error) {
@@ -95,7 +95,7 @@ function GeneralSettings() {
         try {
             // Update user document with new settings
             await updateUser(currentUser.uid, {
-                platformName: platformName.trim() || undefined,
+                websiteName: websiteName.trim() || undefined,
                 communicationEmail: communicationEmail.trim() || undefined,
             });
 
@@ -116,16 +116,16 @@ function GeneralSettings() {
             
             <div className="space-y-6">
                 <div className="space-y-2">
-                    <Label htmlFor="platform-name">Platform Name</Label>
+                    <Label htmlFor="website-name">Website Name</Label>
                     <Input
-                        id="platform-name"
-                        placeholder="Shiply"
-                        value={platformName}
-                        onChange={(e) => setPlatformName(e.target.value)}
+                        id="website-name"
+                        placeholder="My Website"
+                        value={websiteName}
+                        onChange={(e) => setWebsiteName(e.target.value)}
                         className="max-w-md"
                     />
                     <p className="text-xs text-muted-foreground">
-                        The name of your platform or company
+                        The name of your website or platform
                     </p>
                 </div>
                 
