@@ -12,6 +12,10 @@ export interface User {
     // NEW: User-centric API and configuration
     apiKey: string;           // Auto-generated on registration
     sdkConfig: WidgetConfig;  // User's widget configuration
+    
+    // NEW: General settings
+    websiteName?: string;     // User's website name
+    communicationEmail?: string; // Email for communications (can be different from login email)
 }
 
 // Firestore document types
@@ -28,6 +32,10 @@ export interface UserDocument {
     // NEW: User-centric API and configuration
     apiKey: string;           // Auto-generated on registration
     sdkConfig: WidgetConfig;  // User's widget configuration
+    
+    // NEW: General settings
+    websiteName?: string;     // User's website name
+    communicationEmail?: string; // Email for communications (can be different from login email)
 }
 
 // User management types
@@ -46,6 +54,8 @@ export interface UpdateUserRequest {
     website?: string;
     isActive?: boolean;
     role?: 'admin' | 'user';
+    websiteName?: string;
+    communicationEmail?: string;
 }
 
 export interface UserProfile {
@@ -60,6 +70,10 @@ export interface UserProfile {
     // NEW: User-centric API and configuration
     apiKey: string;           // Auto-generated on registration
     sdkConfig: WidgetConfig;  // User's widget configuration
+    
+    // NEW: General settings
+    websiteName?: string;     // User's website name
+    communicationEmail?: string; // Email for communications (can be different from login email)
 }
 
 export interface Feedback {

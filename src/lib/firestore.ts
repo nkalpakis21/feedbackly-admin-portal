@@ -41,8 +41,17 @@ export async function getUser(uid: string): Promise<User | null> {
     return null;
 }
 
-export async function updateUser(userId: string, data: Partial<User>): Promise<void> {
-    const docRef = doc(db, 'users', userId);
+export async function updateUser(uid: string, data: Partial<User>): Promise<void> {
+    // First find the user document by UID
+    const q = query(usersCollection, where('uid', '==', uid));
+    const querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty) {
+        throw new Error(`User with UID ${uid} not found`);
+    }
+    
+    const userDoc = querySnapshot.docs[0];
+    const docRef = doc(db, 'users', userDoc.id);
     await updateDoc(docRef, data);
 }
 
