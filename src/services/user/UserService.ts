@@ -49,10 +49,11 @@ export class UserService {
 
             // Create user document
             console.log('🔍 [USER_SERVICE] Creating user document in Firestore...');
+            console.log('🔍 [USER_SERVICE] User data:', userData);
             const userDocument = await this.userRepository.create({
                 uid: userData.uid!,
                 email: userData.email,
-                name: userData.displayName || userData.name,
+                name: userData.displayName || userData.name || '',
                 isActive: true,
                 apiKey,
                 sdkConfig,
