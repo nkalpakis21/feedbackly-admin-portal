@@ -5,7 +5,6 @@ import {
     getDoc,
     addDoc,
     updateDoc,
-    deleteDoc,
     query,
     where,
     orderBy,
@@ -48,7 +47,7 @@ export async function updateUser(uid: string, data: Partial<User>): Promise<void
     if (!userDoc) throw new Error('User not found');
 
     // Only update allowed fields
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (data.name !== undefined) updateData.name = data.name;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
     if (data.sdkConfig !== undefined) updateData.sdkConfig = data.sdkConfig;
@@ -69,7 +68,7 @@ export async function createUser(userData: Omit<User, 'id' | 'createdAt' | 'upda
         apiKey: userData.apiKey,
         sdkConfig: userData.sdkConfig,
         createdAt: now,
-    } as any);
+    } as unknown as User);
 
     return {
         id: docRef.id,
@@ -242,8 +241,6 @@ export async function getAnalytics(): Promise<Analytics> {
 
     const totalUsers = usersSnapshot.size;
     const totalFeedback = feedbackSnapshot.size;
-    
-    const activeUsers = usersSnapshot.docs.filter(doc => doc.data().isActive).length;
     
     // Calculate average rating from all feedback
     const allFeedback = feedbackSnapshot.docs.map(doc => doc.data());

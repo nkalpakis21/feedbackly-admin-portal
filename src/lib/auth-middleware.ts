@@ -1,11 +1,32 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getAuth } from 'firebase-admin/auth';
-import { adminApp } from '@/lib/firebase-admin-server';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
 export interface AuthenticatedUser {
     uid: string;
     email: string;
     name?: string;
+}
+
+/**
+ * Get Firebase Admin app instance
+ */
+function getAdminApp() {
+    if (getApps().length === 0) {
+        if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PRIVATE_KEY) {
+            throw new Error('Firebase Admin SDK not configured');
+        }
+        
+        return initializeApp({
+            credential: cert({
+                projectId: process.env.FIREBASE_PROJECT_ID,
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+            }),
+            projectId: process.env.FIREBASE_PROJECT_ID,
+        });
+    }
+    return getApps()[0];
 }
 
 /**
@@ -23,11 +44,7 @@ export async function verifyFirebaseToken(request: NextRequest): Promise<Authent
         const token = authHeader.replace('Bearer ', '');
         console.log('🔍 [AUTH] Verifying Firebase token...');
         
-        if (!adminApp) {
-            console.error('❌ [AUTH] Firebase Admin not initialized');
-            return null;
-        }
-
+        const adminApp = getAdminApp();
         const auth = getAuth(adminApp);
         const decodedToken = await auth.verifyIdToken(token);
         
@@ -47,16 +64,13 @@ export async function verifyFirebaseToken(request: NextRequest): Promise<Authent
 /**
  * Middleware to require authentication for admin portal routes
  */
-export async function requireAuth(request: NextRequest): Promise<{ user: AuthenticatedUser } | { error: Response }> {
+export async function requireAuth(request: NextRequest): Promise<{ user: AuthenticatedUser } | { error: NextResponse }> {
     const user = await verifyFirebaseToken(request);
     
     if (!user) {
-        const response = new Response(
-            JSON.stringify({ error: 'Authentication required' }),
-            { 
-                status: 401,
-                headers: { 'Content-Type': 'application/json' }
-            }
+        const response = NextResponse.json(
+            { error: 'Authentication required' },
+            { status: 401 }
         );
         return { error: response };
     }
