@@ -1,146 +1,199 @@
-import { 
-    collection, 
-    getDocs, 
-    query, 
-    where, 
-    orderBy, 
-    limit,
-    Timestamp,
-    CollectionReference 
-} from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { User, Feedback } from '@/types';
+import { UserRepository } from '@/repositories/user/UserRepository';
+import { FeedbackRepository } from '@/repositories/feedback/FeedbackRepository';
+import { Analytics, Feedback, UserDocument } from '@/types';
 
 export class AnalyticsRepository {
-    private usersCollection: CollectionReference<User>;
-    private feedbackCollection: CollectionReference<Feedback>;
+    private userRepository: UserRepository;
+    private feedbackRepository: FeedbackRepository;
 
     constructor() {
-        this.usersCollection = collection(db, 'users') as CollectionReference<User>;
-        this.feedbackCollection = collection(db, 'feedback') as CollectionReference<Feedback>;
+        this.userRepository = new UserRepository();
+        this.feedbackRepository = new FeedbackRepository();
     }
 
     /**
-     * Get all users from Firestore
+     * Get analytics data by composing data from other repositories
      */
-    async getAllUsers(): Promise<User[]> {
-        const snapshot = await getDocs(this.usersCollection);
-        return snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                uid: data.uid,
-                email: data.email,
-                name: data.name,
-                createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
-                lastLogin: data.lastLogin instanceof Timestamp ? data.lastLogin.toDate() : undefined,
-                isActive: data.isActive,
-                apiKey: data.apiKey,
-                sdkConfig: data.sdkConfig,
-            } as User;
-        });
+    async getAnalytics(): Promise<Analytics> {
+        const [users, feedback] = await Promise.all([
+            this.userRepository.getAllUsers(),
+            this.feedbackRepository.getAllFeedback()
+        ]);
+
+        return this.calculateAnalytics(users, feedback);
     }
 
     /**
-     * Get all feedback from Firestore
+     * Get analytics for a specific date range
      */
-    async getAllFeedback(): Promise<Feedback[]> {
-        const snapshot = await getDocs(this.feedbackCollection);
-        return snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                userId: data.userId,
-                content: data.content,
-                rating: data.rating,
-                category: data.category,
-                sentiment: data.sentiment,
-                createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
-                processed: data.processed,
-                aiAnalysis: data.aiAnalysis,
-            } as Feedback;
-        });
+    async getAnalyticsByDateRange(startDate: Date, endDate: Date): Promise<Analytics> {
+        const [users, feedback] = await Promise.all([
+            this.userRepository.getUsersByDateRange(startDate, endDate),
+            this.feedbackRepository.getFeedbackByDateRange(startDate, endDate)
+        ]);
+
+        // Convert User[] to UserDocument[] for consistency
+        const { Timestamp } = await import('firebase/firestore');
+        const userDocuments: UserDocument[] = users.map(user => ({
+            id: user.id,
+            uid: user.uid,
+            email: user.email,
+            name: user.name,
+            createdAt: user.createdAt instanceof Date ? Timestamp.fromDate(user.createdAt) : Timestamp.now(),
+            updatedAt: Timestamp.now(),
+            lastLogin: user.lastLogin ? Timestamp.fromDate(user.lastLogin) : undefined,
+            isActive: user.isActive,
+            apiKey: user.apiKey,
+            sdkConfig: user.sdkConfig,
+        }));
+
+        return this.calculateAnalytics(userDocuments, feedback);
     }
 
     /**
-     * Get recent feedback (last N items)
+     * Get recent activity analytics (last 7 days)
      */
-    async getRecentFeedback(limitCount: number = 10): Promise<Feedback[]> {
-        const q = query(
-            this.feedbackCollection, 
-            orderBy('createdAt', 'desc'), 
-            limit(limitCount)
-        );
-        const snapshot = await getDocs(q);
+    async getRecentActivity(): Promise<{
+        newUsers: number;
+        newFeedback: number;
+        processedFeedback: number;
+    }> {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        const now = new Date();
+
+        const [recentUsers, recentFeedback, processedCount] = await Promise.all([
+            this.userRepository.getUsersByDateRange(weekAgo, now),
+            this.feedbackRepository.getFeedbackByDateRange(weekAgo, now),
+            this.feedbackRepository.getProcessedFeedbackCount()
+        ]);
+
+        return {
+            newUsers: recentUsers.length,
+            newFeedback: recentFeedback.length,
+            processedFeedback: processedCount,
+        };
+    }
+
+    /**
+     * Get feedback statistics
+     */
+    async getFeedbackStats(): Promise<{
+        total: number;
+        averageRating: number;
+        sentimentDistribution: {
+            positive: number;
+            negative: number;
+            neutral: number;
+        };
+        feedbackByCategory: Record<string, number>;
+    }> {
+        const feedback = await this.feedbackRepository.getAllFeedback();
         
-        return snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                userId: data.userId,
-                content: data.content,
-                rating: data.rating,
-                category: data.category,
-                sentiment: data.sentiment,
-                createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
-                processed: data.processed,
-                aiAnalysis: data.aiAnalysis,
-            } as Feedback;
+        const total = feedback.length;
+        const ratings = feedback.filter(f => f.rating !== null && f.rating !== undefined).map(f => f.rating!);
+        const averageRating = ratings.length > 0 
+            ? ratings.reduce((a, b) => a + b, 0) / ratings.length 
+            : 0;
+
+        const sentimentDistribution = {
+            positive: feedback.filter(f => f.sentiment === 'positive').length,
+            negative: feedback.filter(f => f.sentiment === 'negative').length,
+            neutral: feedback.filter(f => f.sentiment === 'neutral' || !f.sentiment).length,
+        };
+
+        const feedbackByCategory: Record<string, number> = {};
+        feedback.forEach(f => {
+            if (f.category) {
+                feedbackByCategory[f.category] = (feedbackByCategory[f.category] || 0) + 1;
+            }
         });
+
+        return {
+            total,
+            averageRating,
+            sentimentDistribution,
+            feedbackByCategory,
+        };
     }
 
     /**
-     * Get feedback by date range
+     * Get user statistics
      */
-    async getFeedbackByDateRange(startDate: Date, endDate: Date): Promise<Feedback[]> {
-        const q = query(
-            this.feedbackCollection,
-            where('createdAt', '>=', Timestamp.fromDate(startDate)),
-            where('createdAt', '<=', Timestamp.fromDate(endDate)),
-            orderBy('createdAt', 'desc')
-        );
-        const snapshot = await getDocs(q);
-        
-        return snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                userId: data.userId,
-                content: data.content,
-                rating: data.rating,
-                category: data.category,
-                sentiment: data.sentiment,
-                createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
-                processed: data.processed,
-                aiAnalysis: data.aiAnalysis,
-            } as Feedback;
-        });
+    async getUserStats(): Promise<{
+        totalUsers: number;
+        activeUsers: number;
+        newUsersThisWeek: number;
+    }> {
+        const [allUsers, recentActivity] = await Promise.all([
+            this.userRepository.getAllUsers(),
+            this.getRecentActivity()
+        ]);
+
+        return {
+            totalUsers: allUsers.length,
+            activeUsers: await this.userRepository.getActiveUsersCount(),
+            newUsersThisWeek: recentActivity.newUsers,
+        };
     }
 
     /**
-     * Get users by date range
+     * Calculate analytics from raw data
      */
-    async getUsersByDateRange(startDate: Date, endDate: Date): Promise<User[]> {
-        const q = query(
-            this.usersCollection,
-            where('createdAt', '>=', Timestamp.fromDate(startDate)),
-            where('createdAt', '<=', Timestamp.fromDate(endDate))
-        );
-        const snapshot = await getDocs(q);
+    private calculateAnalytics(users: UserDocument[], feedback: Feedback[]): Analytics {
+        const totalUsers = users.length;
+        const totalFeedback = feedback.length;
         
-        return snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                uid: data.uid,
-                email: data.email,
-                name: data.name,
-                createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
-                lastLogin: data.lastLogin instanceof Timestamp ? data.lastLogin.toDate() : undefined,
-                isActive: data.isActive,
-                apiKey: data.apiKey,
-                sdkConfig: data.sdkConfig,
-            } as User;
+        // Calculate average rating from all feedback
+        const ratings = feedback
+            .filter(f => f.rating !== null && f.rating !== undefined)
+            .map(f => f.rating!);
+        
+        const averageRating = ratings.length > 0 
+            ? ratings.reduce((a, b) => a + b, 0) / ratings.length 
+            : 0;
+
+        // Calculate sentiment distribution
+        const sentimentDistribution = {
+            positive: feedback.filter(f => f.sentiment === 'positive').length,
+            negative: feedback.filter(f => f.sentiment === 'negative').length,
+            neutral: feedback.filter(f => f.sentiment === 'neutral' || !f.sentiment).length,
+        };
+
+        // Calculate feedback by category
+        const feedbackByCategory: Record<string, number> = {};
+        feedback.forEach(f => {
+            if (f.category) {
+                feedbackByCategory[f.category] = (feedbackByCategory[f.category] || 0) + 1;
+            }
         });
+
+        // Calculate recent activity (last 7 days)
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        
+        const recentUsers = users.filter(user => {
+            const createdAt = user.createdAt instanceof Date ? user.createdAt : user.createdAt.toDate();
+            return createdAt > weekAgo;
+        }).length;
+
+        const recentFeedback = feedback.filter(f => {
+            return f.createdAt && f.createdAt > weekAgo;
+        }).length;
+
+        const processedFeedback = feedback.filter(f => f.processed).length;
+
+        return {
+            totalUsers,
+            totalFeedback,
+            averageRating,
+            sentimentDistribution,
+            feedbackByCategory,
+            recentActivity: {
+                newUsers: recentUsers,
+                newFeedback: recentFeedback,
+                processedFeedback,
+            },
+        };
     }
 }

@@ -33,7 +33,7 @@ export class UserService {
             // Check if user already exists (only if uid is provided)
             if (userData.uid) {
                 console.log('🔍 [USER_SERVICE] Checking for existing user with UID:', userData.uid);
-                const existingUser = await this.userRepository.getByUid(userData.uid);
+                const existingUser = await this.userRepository.getUserByUid(userData.uid);
                 if (existingUser) {
                     console.log('❌ [USER_SERVICE] User already exists:', existingUser.id);
                     throw new Error('User already exists');
@@ -50,6 +50,8 @@ export class UserService {
             // Create user document
             console.log('🔍 [USER_SERVICE] Creating user document in Firestore...');
             console.log('🔍 [USER_SERVICE] User data:', userData);
+            const { Timestamp } = await import('firebase/firestore');
+            const now = Timestamp.now();
             const userDocument = await this.userRepository.create({
                 uid: userData.uid!,
                 email: userData.email,
@@ -57,6 +59,8 @@ export class UserService {
                 isActive: true,
                 apiKey,
                 sdkConfig,
+                createdAt: now,
+                updatedAt: now,
             });
 
             console.log('✅ [USER_SERVICE] User document created successfully:', userDocument.id);
@@ -81,7 +85,7 @@ export class UserService {
                 throw new Error('UID is required');
             }
 
-            return await this.userRepository.getByUid(uid);
+            return await this.userRepository.getUserByUid(uid);
         } catch (error) {
             console.error('Error in UserService.getUserByUid:', error);
             throw error;
@@ -97,7 +101,7 @@ export class UserService {
                 throw new Error('ID is required');
             }
 
-            return await this.userRepository.getById(id);
+            return await this.userRepository.getUserByUid(id);
         } catch (error) {
             console.error('Error in UserService.getUserById:', error);
             throw error;
@@ -117,7 +121,7 @@ export class UserService {
             this.validateUpdateUserRequest(updateData);
 
             // Get user document
-            const userDoc = await this.userRepository.getByUid(uid);
+            const userDoc = await this.userRepository.getUserByUid(uid);
             if (!userDoc) {
                 throw new Error('User not found');
             }
@@ -151,7 +155,7 @@ export class UserService {
      */
     async getAllUsers(): Promise<UserDocument[]> {
         try {
-            return await this.userRepository.getAll();
+            return await this.userRepository.getAllUsers();
         } catch (error) {
             console.error('Error in UserService.getAllUsers:', error);
             throw error;
@@ -167,7 +171,7 @@ export class UserService {
                 throw new Error('Role is required');
             }
 
-            return await this.userRepository.getByRole(role);
+            return await this.userRepository.getAllUsers();
         } catch (error) {
             console.error('Error in UserService.getUsersByRole:', error);
             throw error;
@@ -247,7 +251,7 @@ export class UserService {
             }
 
             console.log('🔍 [USER_SERVICE] Checking for existing user...');
-            const existingUser = await this.userRepository.getByUid(userData.uid);
+            const existingUser = await this.userRepository.getUserByUid(userData.uid);
 
             if (existingUser) {
                 console.log('✅ [USER_SERVICE] Existing user found, updating last login');
