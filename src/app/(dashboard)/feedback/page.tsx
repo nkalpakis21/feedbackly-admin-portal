@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getFeedback } from '@/lib/firestore';
+import { getRecentFeedback } from '@/lib/firestore';
 import { Feedback } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,7 @@ export default function FeedbackPage() {
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
-        const data = await getFeedback();
+        const data = await getRecentFeedback(50); // Get last 50 feedback items
         setFeedback(data);
       } catch (error) {
         console.error('Error fetching feedback:', error);
