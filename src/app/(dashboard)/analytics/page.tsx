@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { getAnalytics } from '@/lib/firestore';
 import { Analytics } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 
 export default function AnalyticsPage() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
@@ -27,20 +28,12 @@ export default function AnalyticsPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Detailed insights and analytics for your platform
-          </p>
-        </div>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
               <CardContent className="p-6">
-                <div className="animate-pulse">
-                  <div className="h-4 bg-muted rounded w-3/4 mb-4"></div>
-                  <div className="h-8 bg-muted rounded w-1/2"></div>
-                </div>
+                <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                <div className="h-8 bg-muted rounded w-1/2"></div>
               </CardContent>
             </Card>
           ))}
@@ -53,16 +46,16 @@ export default function AnalyticsPage() {
     return <div>Error loading analytics</div>;
   }
 
+  // Safe value extraction with fallbacks
+  const safeAverageRating = analytics.averageRating ?? 0;
+  const safeTotalFeedback = analytics.totalFeedback ?? 0;
+  const safeProcessedFeedback = analytics.recentActivity?.processedFeedback ?? 0;
+  const safeSentimentDistribution = analytics.sentimentDistribution ?? { positive: 0, negative: 0, neutral: 0 };
+  const safeFeedbackByCategory = analytics.feedbackByCategory ?? {};
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
-        <p className="text-muted-foreground">
-          Detailed insights and analytics for your platform
-        </p>
-      </div>
-
-      {/* Overview Stats */}
+      {/* Key Metrics */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card style={{ borderLeftColor: '#3b82f6', borderLeftWidth: '4px' }}>
           <CardContent className="p-6">
@@ -76,7 +69,7 @@ export default function AnalyticsPage() {
                     Total Feedback
                   </p>
                   <p className="text-2xl font-bold text-chart-1">
-                    {analytics.totalFeedback}
+                    {safeTotalFeedback}
                   </p>
                 </div>
               </div>
@@ -99,7 +92,7 @@ export default function AnalyticsPage() {
                     Average Rating
                   </p>
                   <p className="text-2xl font-bold text-chart-4">
-                    {analytics.averageRating}
+                    {safeAverageRating.toFixed(1)}
                   </p>
                 </div>
               </div>
@@ -122,7 +115,7 @@ export default function AnalyticsPage() {
                     Processed Feedback
                   </p>
                   <p className="text-2xl font-bold text-chart-2">
-                    {analytics.recentActivity.processedFeedback}
+                    {safeProcessedFeedback}
                   </p>
                 </div>
               </div>
@@ -137,113 +130,77 @@ export default function AnalyticsPage() {
       {/* Detailed Analytics */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Sentiment Distribution */}
-        <Card style={{ borderLeftColor: '#ef4444', borderLeftWidth: '4px' }}>
+        <Card>
           <CardHeader>
             <CardTitle>Sentiment Distribution</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Positive</span>
-                <div className="flex items-center">
-                  <div className="w-32 bg-muted rounded-full h-2 mr-3">
-                    <div
-                      className="bg-chart-1 h-2 rounded-full"
-                      style={{
-                        width: `${(analytics.sentimentDistribution.positive / analytics.totalFeedback) * 100}%`,
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {analytics.sentimentDistribution.positive}
-                  </span>
-                </div>
+                <span className="text-sm text-muted-foreground">{safeSentimentDistribution.positive}</span>
               </div>
+              <Progress value={(safeSentimentDistribution.positive / Math.max(safeTotalFeedback, 1)) * 100} className="h-2" />
+              
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Neutral</span>
-                <div className="flex items-center">
-                  <div className="w-32 bg-muted rounded-full h-2 mr-3">
-                    <div
-                      className="bg-chart-4 h-2 rounded-full"
-                      style={{
-                        width: `${(analytics.sentimentDistribution.neutral / analytics.totalFeedback) * 100}%`,
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {analytics.sentimentDistribution.neutral}
-                  </span>
-                </div>
+                <span className="text-sm text-muted-foreground">{safeSentimentDistribution.neutral}</span>
               </div>
+              <Progress value={(safeSentimentDistribution.neutral / Math.max(safeTotalFeedback, 1)) * 100} className="h-2" />
+              
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Negative</span>
-                <div className="flex items-center">
-                  <div className="w-32 bg-muted rounded-full h-2 mr-3">
-                    <div
-                      className="bg-chart-3 h-2 rounded-full"
-                      style={{
-                        width: `${(analytics.sentimentDistribution.negative / analytics.totalFeedback) * 100}%`,
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {analytics.sentimentDistribution.negative}
-                  </span>
-                </div>
+                <span className="text-sm text-muted-foreground">{safeSentimentDistribution.negative}</span>
               </div>
+              <Progress value={(safeSentimentDistribution.negative / Math.max(safeTotalFeedback, 1)) * 100} className="h-2" />
             </div>
           </CardContent>
         </Card>
 
-        {/* Recent Activity */}
-        <Card style={{ borderLeftColor: '#06b6d4', borderLeftWidth: '4px' }}>
+        {/* Feedback by Category */}
+        <Card>
           <CardHeader>
-            <CardTitle>Recent Activity (7 days)</CardTitle>
+            <CardTitle>Feedback by Category</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">New Feedback</span>
-                <span className="text-lg font-semibold text-chart-1">
-                  {analytics.recentActivity.newFeedback}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Processed Feedback</span>
-                <span className="text-lg font-semibold text-chart-2">
-                  {analytics.recentActivity.processedFeedback}
-                </span>
-              </div>
+              {Object.entries(safeFeedbackByCategory).length > 0 ? (
+                Object.entries(safeFeedbackByCategory).map(([category, count]) => (
+                  <div key={category} className="flex items-center justify-between">
+                    <span className="text-sm font-medium capitalize">{category}</span>
+                    <span className="text-sm text-muted-foreground">{count}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No category data available</p>
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Feedback by Category */}
-      {Object.keys(analytics.feedbackByCategory).length > 0 && (
-        <Card style={{ borderLeftColor: '#8b5cf6', borderLeftWidth: '4px' }}>
-          <CardHeader>
-            <CardTitle>Feedback by Category</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {Object.entries(analytics.feedbackByCategory).map(([category, count]) => (
-                <div key={category} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <span className="text-sm font-medium capitalize">
-                    {category}
-                  </span>
-                  <span className="text-lg font-semibold text-gray-900">
-                    {count}
-                  </span>
-                </div>
-              ))}
+      {/* Recent Activity */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Activity</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="text-center">
+              <p className="text-2xl font-bold">{analytics.recentActivity?.newUsers ?? 0}</p>
+              <p className="text-sm text-muted-foreground">New Users (7 days)</p>
             </div>
-          </CardContent>
-        </Card>
-      )}
+            <div className="text-center">
+              <p className="text-2xl font-bold">{analytics.recentActivity?.newFeedback ?? 0}</p>
+              <p className="text-sm text-muted-foreground">New Feedback (7 days)</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold">{safeProcessedFeedback}</p>
+              <p className="text-sm text-muted-foreground">Processed Feedback</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-
-
-

@@ -54,10 +54,15 @@ export default function DashboardStats() {
     { name: 'Jun', value: 700 },
   ];
 
+  // Safe value extraction with fallbacks
+  const safeAverageRating = analytics.averageRating ?? 0;
+  const safeTotalFeedback = analytics.totalFeedback ?? 0;
+  const safeProcessedFeedback = analytics.recentActivity?.processedFeedback ?? 0;
+
   const stats = [
     {
       name: 'Total Feedback',
-      value: analytics.totalFeedback,
+      value: safeTotalFeedback,
       change: '+20.1% from last month',
       icon: '💬',
       color: 'text-chart-1',
@@ -66,7 +71,7 @@ export default function DashboardStats() {
     },
     {
       name: 'Average Rating',
-      value: analytics.averageRating.toFixed(1),
+      value: safeAverageRating.toFixed(1),
       change: '+0.3 from last month',
       icon: '⭐',
       color: 'text-chart-4',
@@ -75,7 +80,7 @@ export default function DashboardStats() {
     },
     {
       name: 'Processed Feedback',
-      value: analytics.recentActivity.processedFeedback,
+      value: safeProcessedFeedback,
       change: '+12.5% from last month',
       icon: '✅',
       color: 'text-chart-2',
@@ -126,6 +131,3 @@ export default function DashboardStats() {
     </div>
   );
 }
-
-
-
