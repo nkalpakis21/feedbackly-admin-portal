@@ -1,29 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getAnalytics } from '@/lib/firestore';
-import { Analytics } from '@/types';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { Card, CardContent } from '@/components/ui/card';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 export default function DashboardStats() {
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const data = await getAnalytics();
-        setAnalytics(data);
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnalytics();
-  }, []);
+  const { analytics, loading, error, refetch } = useAnalytics();
 
   if (loading) {
     return (
@@ -40,8 +22,38 @@ export default function DashboardStats() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card className="col-span-full">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-destructive">Error loading analytics: {error}</p>
+              <button 
+                onClick={refetch} 
+                className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+              >
+                Retry
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (!analytics) {
-    return <div>Error loading analytics</div>;
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card className="col-span-full">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-muted-foreground">No analytics data available</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   // Sample chart data
@@ -54,10 +66,15 @@ export default function DashboardStats() {
     { name: 'Jun', value: 700 },
   ];
 
+  // Safe value extraction with fallbacks
+  const safeAverageRating = analytics.averageRating ?? 0;
+  const safeTotalFeedback = analytics.totalFeedback ?? 0;
+  const safeProcessedFeedback = analytics.recentActivity?.processedFeedback ?? 0;
+
   const stats = [
     {
       name: 'Total Feedback',
-      value: analytics.totalFeedback,
+      value: safeTotalFeedback,
       change: '+20.1% from last month',
       icon: '💬',
       color: 'text-chart-1',
@@ -66,7 +83,7 @@ export default function DashboardStats() {
     },
     {
       name: 'Average Rating',
-      value: analytics.averageRating.toFixed(1),
+      value: safeAverageRating.toFixed(1),
       change: '+0.3 from last month',
       icon: '⭐',
       color: 'text-chart-4',
@@ -75,7 +92,7 @@ export default function DashboardStats() {
     },
     {
       name: 'Processed Feedback',
-      value: analytics.recentActivity.processedFeedback,
+      value: safeProcessedFeedback,
       change: '+12.5% from last month',
       icon: '✅',
       color: 'text-chart-2',
@@ -126,6 +143,3 @@ export default function DashboardStats() {
     </div>
   );
 }
-
-
-
