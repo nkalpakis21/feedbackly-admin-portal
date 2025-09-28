@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 
 export default function RecentFeedback() {
   const { currentUser } = useAuth();
+  console.log('currentUser', currentUser);
   const { feedback, loading, error, refetch } = useUserFeedback({ 
     userId: currentUser?.uid || '' 
   });

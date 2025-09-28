@@ -3,6 +3,7 @@ import { addCorsHeaders } from '@/lib/cors';
 import { requireAuth } from '@/lib/auth-middleware';
 import { FeedbackService } from '@/services/feedback/FeedbackService';
 import { FeedbackRepository } from '@/repositories/feedback/FeedbackRepository';
+import { UserRepository } from '@/repositories/user/UserRepository';
 
 export async function OPTIONS() {
     return new NextResponse(null, { status: 200 });
@@ -46,7 +47,21 @@ export async function GET(request: NextRequest) {
                         origin
                     );
                 }
-                feedback = await feedbackService.getFeedbackByUser(userId);
+                
+                // Cross-reference Firebase UID to Firestore user ID
+                console.log('Looking up user by Firebase UID:', userId);
+                const userRepository = new UserRepository();
+                const user = await userRepository.getUserByUid(userId);
+                
+                if (!user) {
+                    return addCorsHeaders(
+                        NextResponse.json({ error: 'User not found' }, { status: 404 }),
+                        origin
+                    );
+                }
+                
+                console.log('Found user in Firestore:', user.id, 'Fetching feedback for user');
+                feedback = await feedbackService.getFeedbackByUser(user.id);
                 break;
             case 'dateRange':
                 const startDate = searchParams.get('startDate');
