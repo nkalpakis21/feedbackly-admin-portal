@@ -186,13 +186,21 @@ export class AuthService {
      * Build user data from Firebase User object
      */
     private buildUserData(user: User, provider: AuthProvider): CreateUserRequest {
-        return {
+        const userData: CreateUserRequest = {
             uid: user.uid,
             email: user.email || '',
-            displayName: user.displayName || undefined,
-            photoURL: user.photoURL || undefined,
             provider,
         };
+
+        // Only add optional fields if they have values
+        if (user.displayName) {
+            userData.displayName = user.displayName;
+        }
+        if (user.photoURL) {
+            userData.photoURL = user.photoURL;
+        }
+
+        return userData;
     }
 
     /**
