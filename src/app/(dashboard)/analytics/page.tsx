@@ -1,11 +1,11 @@
 'use client';
 
-import { useAnalytics } from '@/hooks/useAnalytics';
+import { useUserAnalytics } from '@/hooks/useUserAnalytics';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
 export default function AnalyticsPage() {
-  const { analytics, loading, error, refetch } = useAnalytics();
+  const { userAnalytics, loading, error, refetch } = useUserAnalytics();
 
   if (loading) {
     return (
@@ -30,15 +30,15 @@ export default function AnalyticsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
           <p className="text-muted-foreground">
-            View detailed analytics and insights
+            View your personal analytics and insights
           </p>
         </div>
         <Card>
           <CardContent className="p-6">
             <div className="text-center">
               <p className="text-destructive">Error loading analytics: {error}</p>
-              <button 
-                onClick={refetch} 
+              <button
+                onClick={refetch}
                 className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
               >
                 Retry
@@ -50,13 +50,13 @@ export default function AnalyticsPage() {
     );
   }
 
-  if (!analytics) {
+  if (!userAnalytics) {
     return (
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
           <p className="text-muted-foreground">
-            View detailed analytics and insights
+            View your personal analytics and insights
           </p>
         </div>
         <Card>
@@ -71,18 +71,18 @@ export default function AnalyticsPage() {
   }
 
   // Safe value extraction with fallbacks
-  const safeAverageRating = analytics.averageRating ?? 0;
-  const safeTotalFeedback = analytics.totalFeedback ?? 0;
-  const safeProcessedFeedback = analytics.recentActivity?.processedFeedback ?? 0;
-  const safeSentimentDistribution = analytics.sentimentDistribution ?? { positive: 0, negative: 0, neutral: 0 };
-  const safeFeedbackByCategory = analytics.feedbackByCategory ?? {};
+  const safeAverageRating = userAnalytics.averageRating ?? 0;
+  const safeTotalFeedback = userAnalytics.totalFeedback ?? 0;
+  const safeProcessedFeedback = userAnalytics.recentActivity?.processedFeedback ?? 0;
+  const safeSentimentDistribution = userAnalytics.sentimentDistribution ?? { positive: 0, negative: 0, neutral: 0 };
+  const safeFeedbackByCategory = userAnalytics.feedbackByCategory ?? {};
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
         <p className="text-muted-foreground">
-          View detailed analytics and insights
+          View your personal analytics and insights
         </p>
       </div>
 
@@ -172,13 +172,13 @@ export default function AnalyticsPage() {
                 <span className="text-sm text-muted-foreground">{safeSentimentDistribution.positive}</span>
               </div>
               <Progress value={(safeSentimentDistribution.positive / Math.max(safeTotalFeedback, 1)) * 100} className="h-2" />
-              
+
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Neutral</span>
                 <span className="text-sm text-muted-foreground">{safeSentimentDistribution.neutral}</span>
               </div>
               <Progress value={(safeSentimentDistribution.neutral / Math.max(safeTotalFeedback, 1)) * 100} className="h-2" />
-              
+
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Negative</span>
                 <span className="text-sm text-muted-foreground">{safeSentimentDistribution.negative}</span>
@@ -216,13 +216,9 @@ export default function AnalyticsPage() {
           <CardTitle>Recent Activity</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="text-center">
-              <p className="text-2xl font-bold">{analytics.recentActivity?.newUsers ?? 0}</p>
-              <p className="text-sm text-muted-foreground">New Users (7 days)</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold">{analytics.recentActivity?.newFeedback ?? 0}</p>
+              <p className="text-2xl font-bold">{userAnalytics.recentActivity?.newFeedback ?? 0}</p>
               <p className="text-sm text-muted-foreground">New Feedback (7 days)</p>
             </div>
             <div className="text-center">

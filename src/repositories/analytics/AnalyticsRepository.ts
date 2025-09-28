@@ -2,6 +2,22 @@ import { UserRepository } from '@/repositories/user/UserRepository';
 import { FeedbackRepository } from '@/repositories/feedback/FeedbackRepository';
 import { Analytics, Feedback, UserDocument } from '@/types';
 
+export interface UserAnalytics {
+    userId: string;
+    totalFeedback: number;
+    averageRating: number;
+    recentActivity: {
+        newFeedback: number;
+        processedFeedback: number;
+    };
+    feedbackByCategory: Record<string, number>;
+    sentimentDistribution: {
+        positive: number;
+        negative: number;
+        neutral: number;
+    };
+}
+
 export class AnalyticsRepository {
     private userRepository: UserRepository;
     private feedbackRepository: FeedbackRepository;
@@ -48,6 +64,70 @@ export class AnalyticsRepository {
         }));
 
         return this.calculateAnalytics(userDocuments, feedback);
+    }
+
+    /**
+     * Get user-specific analytics data
+     */
+    async getUserAnalytics(userId: string): Promise<UserAnalytics> {
+        // Get user's recent feedback (last 30 days)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const userFeedback = await this.feedbackRepository.getFeedbackByUser(userId);
+        
+        // Filter to recent feedback only
+        const recentFeedback = userFeedback.filter(f => {
+            return f.createdAt && f.createdAt > thirtyDaysAgo;
+        });
+
+        const totalFeedback = recentFeedback.length;
+        
+        // Calculate average rating from recent feedback
+        const ratings = recentFeedback
+            .filter(f => f.rating !== null && f.rating !== undefined)
+            .map(f => f.rating!);
+        
+        const averageRating = ratings.length > 0 
+            ? ratings.reduce((a, b) => a + b, 0) / ratings.length 
+            : 0;
+
+        // Calculate sentiment distribution
+        const sentimentDistribution = {
+            positive: recentFeedback.filter(f => f.sentiment === 'positive').length,
+            negative: recentFeedback.filter(f => f.sentiment === 'negative').length,
+            neutral: recentFeedback.filter(f => f.sentiment === 'neutral' || !f.sentiment).length,
+        };
+
+        // Calculate feedback by category
+        const feedbackByCategory: Record<string, number> = {};
+        recentFeedback.forEach(f => {
+            if (f.category) {
+                feedbackByCategory[f.category] = (feedbackByCategory[f.category] || 0) + 1;
+            }
+        });
+
+        // Calculate recent activity (last 7 days)
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        
+        const newFeedback = recentFeedback.filter(f => {
+            return f.createdAt && f.createdAt > weekAgo;
+        }).length;
+
+        const processedFeedback = recentFeedback.filter(f => f.processed).length;
+
+        return {
+            userId,
+            totalFeedback,
+            averageRating,
+            recentActivity: {
+                newFeedback,
+                processedFeedback,
+            },
+            feedbackByCategory,
+            sentimentDistribution,
+        };
     }
 
     /**
