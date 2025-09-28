@@ -1,6 +1,22 @@
 import { AnalyticsRepository } from '@/repositories/analytics/AnalyticsRepository';
 import { Analytics } from '@/types';
 
+export interface UserAnalytics {
+    userId: string;
+    totalFeedback: number;
+    averageRating: number;
+    recentActivity: {
+        newFeedback: number;
+        processedFeedback: number;
+    };
+    feedbackByCategory: Record<string, number>;
+    sentimentDistribution: {
+        positive: number;
+        negative: number;
+        neutral: number;
+    };
+}
+
 export class AnalyticsService {
     private analyticsRepository: AnalyticsRepository;
 
@@ -20,6 +36,13 @@ export class AnalyticsService {
      */
     async getAnalyticsByDateRange(startDate: Date, endDate: Date): Promise<Analytics> {
         return this.analyticsRepository.getAnalyticsByDateRange(startDate, endDate);
+    }
+
+    /**
+     * Get user-specific analytics data
+     */
+    async getUserAnalytics(userId: string): Promise<UserAnalytics> {
+        return this.analyticsRepository.getUserAnalytics(userId);
     }
 
     /**
