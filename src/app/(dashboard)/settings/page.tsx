@@ -1,22 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import WidgetConfigForm from '@/components/WidgetConfigForm';
 import { WidgetConfig } from '@/types';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/contexts/AuthContext';
+import { getUser, updateUser } from '@/lib/firestore';
 
 export default function SettingsPage() {
     const [activeSection, setActiveSection] = useState('general');
 
     const sections = [
         { id: 'general', name: 'General Settings', icon: '⚙️' },
-        { id: 'widget', name: 'Widget Configuration', icon: '🔧' },
+        // { id: 'widget', name: 'Widget Configuration', icon: '🔧' },
         { id: 'api', name: 'API Keys', icon: '🔑' },
-        { id: 'billing', name: 'Billing', icon: '💳' },
+        // { id: 'billing', name: 'Billing', icon: '💳' },
     ];
 
     return (
@@ -60,6 +61,53 @@ export default function SettingsPage() {
 }
 
 function GeneralSettings() {
+    const { currentUser } = useAuth();
+    const [websiteName, setWebsiteName] = useState('');
+    const [communicationEmail, setCommunicationEmail] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+    // Load current user data
+    useEffect(() => {
+        const loadUserData = async () => {
+            if (!currentUser) return;
+            
+            try {
+                const userDoc = await getUser(currentUser.uid);
+                if (userDoc) {
+                    setWebsiteName(userDoc.websiteName || '');
+                    setCommunicationEmail(userDoc.communicationEmail || '');
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        };
+
+        loadUserData();
+    }, [currentUser]);
+
+    const handleSaveSettings = async () => {
+        if (!currentUser) return;
+
+        setLoading(true);
+        setMessage(null);
+
+        try {
+            // Update user document with new settings
+            await updateUser(currentUser.uid, {
+                websiteName: websiteName.trim() || undefined,
+                communicationEmail: communicationEmail.trim() || undefined,
+            });
+
+            setMessage({ type: 'success', text: 'Settings saved successfully!' });
+        } catch (error) {
+            console.error('Error saving settings:', error);
+            setMessage({ type: 'error', text: 'Failed to save settings. Please try again.' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div>
@@ -68,51 +116,52 @@ function GeneralSettings() {
             
             <div className="space-y-6">
                 <div className="space-y-2">
-                    <Label htmlFor="platform-name">Platform Name</Label>
+                    <Label htmlFor="website-name">Website Name</Label>
                     <Input
-                        id="platform-name"
-                        placeholder="Shiply"
+                        id="website-name"
+                        placeholder="My Website"
+                        value={websiteName}
+                        onChange={(e) => setWebsiteName(e.target.value)}
                         className="max-w-md"
                     />
+                    <p className="text-xs text-muted-foreground">
+                        The name of your website or platform
+                    </p>
                 </div>
                 
                 <div className="space-y-2">
-                    <Label htmlFor="admin-email">Admin Email</Label>
+                    <Label htmlFor="communication-email">Communication Email</Label>
                     <Input
-                        id="admin-email"
+                        id="communication-email"
                         type="email"
                         placeholder="admin@example.com"
+                        value={communicationEmail}
+                        onChange={(e) => setCommunicationEmail(e.target.value)}
                         className="max-w-md"
                     />
+                    <p className="text-xs text-muted-foreground">
+                        Email address for communications and notifications
+                    </p>
                 </div>
-                
-                <div className="space-y-4">
-                    <Label>Email Notifications</Label>
-                    <div className="space-y-3">
-                        <div className="flex items-center space-x-2">
-                            <Checkbox id="new-users" />
-                            <Label htmlFor="new-users" className="text-sm font-normal">
-                                New user registrations
-                            </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Checkbox id="new-feedback" />
-                            <Label htmlFor="new-feedback" className="text-sm font-normal">
-                                New feedback submissions
-                            </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Checkbox id="weekly-reports" />
-                            <Label htmlFor="weekly-reports" className="text-sm font-normal">
-                                Weekly analytics reports
-                            </Label>
-                        </div>
+
+                {message && (
+                    <div className={`p-3 rounded-md text-sm ${
+                        message.type === 'success' 
+                            ? 'bg-green-50 text-green-700 border border-green-200' 
+                            : 'bg-red-50 text-red-700 border border-red-200'
+                    }`}>
+                        {message.text}
                     </div>
-                </div>
+                )}
             </div>
             
             <div className="pt-4">
-                <Button>Save Settings</Button>
+                <Button 
+                    onClick={handleSaveSettings}
+                    disabled={loading}
+                >
+                    {loading ? 'Saving...' : 'Save Settings'}
+                </Button>
             </div>
         </div>
     );
@@ -158,7 +207,7 @@ function ApiSettings() {
                             className="flex-1"
                         />
                         <Button variant="outline" size="sm">Copy</Button>
-                        <Button variant="destructive" size="sm">Regenerate</Button>
+                        {/* <Button variant="destructive" size="sm">Regenerate</Button> */}
                     </div>
                     <p className="text-xs text-muted-foreground">
                         Use this API key in your website&apos;s Shiply widget integration
@@ -204,32 +253,6 @@ function ApiSettings() {
                         <div className="text-blue-400">&#125;</div>
                     </div>
                 </div>
-
-                <div className="space-y-4">
-                    <h4 className="text-md font-semibold">Webhook URLs</h4>
-                    <div className="space-y-3">
-                        <div className="space-y-2">
-                            <Label htmlFor="feedback-webhook">New Feedback Webhook</Label>
-                            <Input
-                                id="feedback-webhook"
-                                type="url"
-                                placeholder="https://your-site.com/webhooks/feedback"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="user-webhook">New User Webhook</Label>
-                            <Input
-                                id="user-webhook"
-                                type="url"
-                                placeholder="https://your-site.com/webhooks/user"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div className="pt-4">
-                <Button>Save API Settings</Button>
             </div>
         </div>
     );

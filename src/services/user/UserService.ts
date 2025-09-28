@@ -20,22 +20,35 @@ export class UserService {
      */
     async createUser(userData: CreateUserRequest): Promise<UserDocument> {
         try {
+            console.log('🔍 [USER_SERVICE] Starting createUser with data:', {
+                uid: userData.uid,
+                email: userData.email,
+                displayName: userData.displayName
+            });
+
             // Validate input data
             this.validateCreateUserRequest(userData);
+            console.log('✅ [USER_SERVICE] Input validation passed');
 
             // Check if user already exists (only if uid is provided)
             if (userData.uid) {
+                console.log('🔍 [USER_SERVICE] Checking for existing user with UID:', userData.uid);
                 const existingUser = await this.userRepository.getByUid(userData.uid);
                 if (existingUser) {
+                    console.log('❌ [USER_SERVICE] User already exists:', existingUser.id);
                     throw new Error('User already exists');
                 }
+                console.log('✅ [USER_SERVICE] No existing user found');
             }
 
             // Generate API key and default config for new user
+            console.log('🔍 [USER_SERVICE] Generating API key and default config...');
             const apiKey = generateApiKey();
             const sdkConfig = getDefaultWidgetConfig();
+            console.log('✅ [USER_SERVICE] Generated API key and config');
 
             // Create user document
+            console.log('🔍 [USER_SERVICE] Creating user document in Firestore...');
             const userDocument = await this.userRepository.create({
                 uid: userData.uid!,
                 email: userData.email,
@@ -45,9 +58,15 @@ export class UserService {
                 sdkConfig,
             });
 
+            console.log('✅ [USER_SERVICE] User document created successfully:', userDocument.id);
             return userDocument;
         } catch (error) {
-            console.error('Error in UserService.createUser:', error);
+            console.error('❌ [USER_SERVICE] Error in createUser:', error);
+            console.error('❌ [USER_SERVICE] Error details:', {
+                message: error instanceof Error ? error.message : 'Unknown error',
+                stack: error instanceof Error ? error.stack : undefined,
+                name: error instanceof Error ? error.name : 'Unknown'
+            });
             throw error;
         }
     }
@@ -219,23 +238,33 @@ export class UserService {
      */
     async createOrUpdateUser(userData: CreateUserRequest): Promise<UserDocument> {
         try {
+            console.log('🔍 [USER_SERVICE] Starting createOrUpdateUser for:', userData.uid);
+            
             if (!userData.uid) {
-                // If no uid, just create a new user
+                console.log('🔍 [USER_SERVICE] No UID provided, creating new user');
                 return await this.createUser(userData);
             }
 
+            console.log('🔍 [USER_SERVICE] Checking for existing user...');
             const existingUser = await this.userRepository.getByUid(userData.uid);
 
             if (existingUser) {
-                // Update last login
+                console.log('✅ [USER_SERVICE] Existing user found, updating last login');
                 await this.updateLastLogin(userData.uid);
                 return existingUser;
             } else {
-                // Create new user
-                return await this.createUser(userData);
+                console.log('🔍 [USER_SERVICE] No existing user found, creating new user document');
+                const newUser = await this.createUser(userData);
+                console.log('✅ [USER_SERVICE] New user document created:', newUser.id);
+                return newUser;
             }
         } catch (error) {
-            console.error('Error in UserService.createOrUpdateUser:', error);
+            console.error('❌ [USER_SERVICE] Error in createOrUpdateUser:', error);
+            console.error('❌ [USER_SERVICE] Error details:', {
+                message: error instanceof Error ? error.message : 'Unknown error',
+                stack: error instanceof Error ? error.stack : undefined,
+                name: error instanceof Error ? error.name : 'Unknown'
+            });
             throw error;
         }
     }
@@ -254,6 +283,8 @@ export class UserService {
             isActive: userDoc.isActive,
             apiKey: userDoc.apiKey,
             sdkConfig: userDoc.sdkConfig,
+            websiteName: userDoc.websiteName,
+            communicationEmail: userDoc.communicationEmail,
         };
     }
 
