@@ -11,6 +11,8 @@ import { auth, googleProvider } from '@/lib/firebase';
 import { UserService } from '../user/UserService';
 import { CreateUserRequest } from '@/types';
 
+type AuthProvider = 'email' | 'google.com';
+
 export class AuthService {
     private userService: UserService;
 
@@ -18,64 +20,56 @@ export class AuthService {
         this.userService = userService;
     }
 
+    // ==================== AUTHENTICATION METHODS ====================
+
     /**
      * Sign in with email and password
      */
     async signInWithEmail(email: string, password: string): Promise<User> {
-        try {
-            if (!email || !password) {
-                throw new Error('Email and password are required');
-            }
+        this.validateCredentials(email, password);
+        
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            // Create or update user document
-            await this.handleUserAuthentication(user, 'email');
-
-            return user;
-        } catch (error) {
-            console.error('Error in AuthService.signInWithEmail:', error);
-            throw error;
-        }
+        await this.handleUserAuthentication(user, 'email');
+        return user;
     }
 
     /**
      * Sign in with Google
      */
     async signInWithGoogle(): Promise<User> {
-        try {
-            const result = await signInWithPopup(auth, googleProvider);
-            const user = result.user;
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
 
-            // Create or update user document
-            await this.handleUserAuthentication(user, 'google.com');
-
-            return user;
-        } catch (error) {
-            console.error('Error in AuthService.signInWithGoogle:', error);
-            throw error;
-        }
+        await this.handleUserAuthentication(user, 'google.com');
+        return user;
     }
 
     /**
      * Sign up with email and password
      */
     async signUpWithEmail(email: string, password: string): Promise<User> {
+        this.validateCredentials(email, password);
+        
+        console.log('🔍 [SIGNUP] Creating Firebase Auth user for:', email);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        console.log('✅ [SIGNUP] Firebase Auth user created:', user.uid);
+
         try {
-            if (!email || !password) {
-                throw new Error('Email and password are required');
-            }
-
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            // Create user document
+            console.log('🔍 [SIGNUP] Creating Firestore user document...');
             await this.handleUserAuthentication(user, 'email');
-
+            console.log('✅ [SIGNUP] Complete signup process finished successfully');
             return user;
         } catch (error) {
-            console.error('Error in AuthService.signUpWithEmail:', error);
+            console.error('❌ [SIGNUP] Error in signup process:', error);
+            
+            // Clean up Firebase Auth user if document creation failed
+            if (error instanceof Error && error.message.includes('Failed to create user document')) {
+                await this.cleanupAuthUser(user);
+            }
+            
             throw error;
         }
     }
@@ -84,48 +78,16 @@ export class AuthService {
      * Sign out
      */
     async signOut(): Promise<void> {
-        try {
-            await signOut(auth);
-        } catch (error) {
-            console.error('Error in AuthService.signOut:', error);
-            throw error;
-        }
+        await signOut(auth);
     }
+
+    // ==================== PUBLIC GETTERS ====================
 
     /**
      * Get current user
      */
     getCurrentUser(): User | null {
         return auth.currentUser;
-    }
-
-    /**
-     * Listen to authentication state changes
-     */
-    onAuthStateChanged(callback: (user: User | null) => void): Unsubscribe {
-        return onAuthStateChanged(auth, callback);
-    }
-
-    /**
-     * Handle user authentication (create or update user document)
-     */
-    private async handleUserAuthentication(user: User, provider: 'email' | 'google.com'): Promise<void> {
-        try {
-            const userData: CreateUserRequest = {
-                uid: user.uid,
-                email: user.email || '',
-                displayName: user.displayName || undefined,
-                photoURL: user.photoURL || undefined,
-                provider,
-            };
-
-            // Create or update user document
-            await this.userService.createOrUpdateUser(userData);
-        } catch (error) {
-            console.error('Error handling user authentication:', error);
-            // Don't throw here to avoid breaking the auth flow
-            // The user is still authenticated even if document creation fails
-        }
     }
 
     /**
@@ -136,69 +98,123 @@ export class AuthService {
     }
 
     /**
-     * Get user's ID token
-     */
-    async getIdToken(): Promise<string | null> {
-        try {
-            const user = auth.currentUser;
-            if (user) {
-                return await user.getIdToken();
-            }
-            return null;
-        } catch (error) {
-            console.error('Error getting ID token:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Refresh user's ID token
-     */
-    async refreshIdToken(): Promise<string | null> {
-        try {
-            const user = auth.currentUser;
-            if (user) {
-                return await user.getIdToken(true);
-            }
-            return null;
-        } catch (error) {
-            console.error('Error refreshing ID token:', error);
-            throw error;
-        }
-    }
-
-    /**
      * Get user's email
      */
     getUserEmail(): string | null {
-        const user = auth.currentUser;
-        return user?.email || null;
+        return auth.currentUser?.email || null;
     }
 
     /**
      * Get user's display name
      */
     getUserDisplayName(): string | null {
-        const user = auth.currentUser;
-        return user?.displayName || null;
+        return auth.currentUser?.displayName || null;
     }
 
     /**
      * Get user's photo URL
      */
     getUserPhotoURL(): string | null {
-        const user = auth.currentUser;
-        return user?.photoURL || null;
+        return auth.currentUser?.photoURL || null;
     }
 
     /**
      * Get user's UID
      */
     getUserUID(): string | null {
+        return auth.currentUser?.uid || null;
+    }
+
+    /**
+     * Get user's ID token
+     */
+    async getIdToken(): Promise<string | null> {
         const user = auth.currentUser;
-        return user?.uid || null;
+        return user ? await user.getIdToken() : null;
+    }
+
+    /**
+     * Refresh user's ID token
+     */
+    async refreshIdToken(): Promise<string | null> {
+        const user = auth.currentUser;
+        return user ? await user.getIdToken(true) : null;
+    }
+
+    /**
+     * Listen to authentication state changes
+     */
+    onAuthStateChanged(callback: (user: User | null) => void): Unsubscribe {
+        return onAuthStateChanged(auth, callback);
+    }
+
+    // ==================== PRIVATE HELPER METHODS ====================
+
+    /**
+     * Validate email and password credentials
+     */
+    private validateCredentials(email: string, password: string): void {
+        if (!email || !password) {
+            throw new Error('Email and password are required');
+        }
+    }
+
+    /**
+     * Handle user authentication (create or update user document)
+     */
+    private async handleUserAuthentication(user: User, provider: AuthProvider): Promise<void> {
+        try {
+            console.log('🔍 [AUTH] Starting user document creation for:', {
+                uid: user.uid,
+                email: user.email,
+                provider
+            });
+
+            const userData = this.buildUserData(user, provider);
+            console.log('🔍 [AUTH] User data prepared:', userData);
+
+            const result = await this.userService.createOrUpdateUser(userData);
+            console.log('✅ [AUTH] User document created successfully:', result);
+        } catch (error) {
+            console.error('❌ [AUTH] Error handling user authentication:', error);
+            this.logErrorDetails(error);
+            throw new Error(`Failed to create user document: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+
+    /**
+     * Build user data from Firebase User object
+     */
+    private buildUserData(user: User, provider: AuthProvider): CreateUserRequest {
+        return {
+            uid: user.uid,
+            email: user.email || '',
+            displayName: user.displayName || undefined,
+            photoURL: user.photoURL || undefined,
+            provider,
+        };
+    }
+
+    /**
+     * Clean up Firebase Auth user (for signup failures)
+     */
+    private async cleanupAuthUser(user: User): Promise<void> {
+        try {
+            console.log('🧹 [SIGNUP] Cleaning up Firebase Auth user due to document creation failure');
+            await user.delete();
+        } catch (deleteError) {
+            console.error('❌ [SIGNUP] Failed to clean up auth user:', deleteError);
+        }
+    }
+
+    /**
+     * Log error details for debugging
+     */
+    private logErrorDetails(error: unknown): void {
+        console.error('❌ [AUTH] Error details:', {
+            message: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined,
+            name: error instanceof Error ? error.name : 'Unknown'
+        });
     }
 }
-
-
-
