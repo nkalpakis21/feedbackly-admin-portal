@@ -7,6 +7,11 @@ export async function OPTIONS(_request: NextRequest) { // eslint-disable-line @t
     return handleCorsPreflight();
 }
 
+/**
+ * POST feedback submission
+ * Uses API key authentication for SDK compatibility
+ * Admin portal uses different authentication method
+ */
 export async function POST(request: NextRequest) {
     console.log('🔍 Debug: POST request received');
     try {
@@ -30,7 +35,7 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(response);
         }
 
-        // Get user by API key
+        // Get user by API key (SDK authentication)
         console.log('🔍 Debug: Looking up user with API key:', apiKey);
         const user = await getUserByApiKey(apiKey);
         console.log('🔍 Debug: User lookup result:', user ? 'User found' : 'User not found');
