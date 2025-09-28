@@ -1,33 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addCorsHeaders, handleCorsPreflight } from '@/lib/cors';
-import { getUserByApiKey } from '@/lib/firestore-server';
+import { addCorsHeaders } from '@/lib/cors';
+import { getUserByUid } from '@/lib/firestore-server';
+import { requireAuth } from '@/lib/auth-middleware';
 
-// Handle CORS preflight requests
 export async function OPTIONS() {
-    return handleCorsPreflight();
+    return new NextResponse(null, { status: 200 });
 }
 
-// GET user configuration by API key
+// GET user configuration by Firebase UID (admin portal)
 export async function GET(request: NextRequest) {
     try {
         const origin = request.headers.get('origin');
-        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') ||
-            request.nextUrl.searchParams.get('apiKey');
-
-        if (!apiKey) {
-            const response = NextResponse.json(
-                { error: 'Missing API key. Provide via Authorization header or apiKey query parameter' },
-                { status: 400 }
-            );
-            return addCorsHeaders(response, origin);
+        
+        // Verify Firebase authentication
+        const authResult = await requireAuth(request);
+        if ('error' in authResult) {
+            return addCorsHeaders(authResult.error, origin);
         }
+        
+        const { user: authUser } = authResult;
+        console.log('🔍 [ADMIN] Getting config for authenticated user:', authUser.uid);
 
-        // Validate API key and get user
-        const user = await getUserByApiKey(apiKey);
+        // Get user document by Firebase UID
+        const user = await getUserByUid(authUser.uid);
         if (!user) {
             const response = NextResponse.json(
-                { error: 'Invalid API key' },
-                { status: 401 }
+                { error: 'User not found' },
+                { status: 404 }
             );
             return addCorsHeaders(response, origin);
         }
@@ -54,33 +53,44 @@ export async function GET(request: NextRequest) {
     }
 }
 
-// PUT update user configuration
+// PUT update user configuration (admin portal)
 export async function PUT(request: NextRequest) {
     try {
-        const body = await request.json();
         const origin = request.headers.get('origin');
-        const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') || body.apiKey;
+        
+        // Verify Firebase authentication
+        const authResult = await requireAuth(request);
+        if ('error' in authResult) {
+            return addCorsHeaders(authResult.error, origin);
+        }
+        
+        const { user: authUser } = authResult;
+        console.log('🔍 [ADMIN] Updating config for authenticated user:', authUser.uid);
 
-        if (!apiKey) {
+        const body = await request.json();
+        const { config } = body;
+
+        if (!config) {
             const response = NextResponse.json(
-                { error: 'Missing API key. Provide via Authorization header or in request body' },
+                { error: 'Configuration is required' },
                 { status: 400 }
             );
             return addCorsHeaders(response, origin);
         }
 
-        // Validate API key and get user
-        const user = await getUserByApiKey(apiKey);
+        // Get user document by Firebase UID
+        const user = await getUserByUid(authUser.uid);
         if (!user) {
             const response = NextResponse.json(
-                { error: 'Invalid API key' },
-                { status: 401 }
+                { error: 'User not found' },
+                { status: 404 }
             );
             return addCorsHeaders(response, origin);
         }
 
-        // TODO: Validate and update user's SDK configuration
-        // This will be implemented when we update the user repository
+        // Update user's SDK configuration
+        // Note: This would need to be implemented in firestore-server.ts
+        // await updateUserSdkConfig(user.id, config);
 
         const response = NextResponse.json({
             success: true,

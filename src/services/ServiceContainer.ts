@@ -1,6 +1,8 @@
 import { UserRepository } from '@/repositories/user/UserRepository';
+import { FeedbackRepository } from '@/repositories/feedback/FeedbackRepository';
 import { UserService } from './user/UserService';
 import { AuthService } from './auth/AuthService';
+import { FeedbackService } from './feedback/FeedbackService';
 
 /**
  * Service Container for dependency injection
@@ -10,16 +12,20 @@ export class ServiceContainer {
     private static instance: ServiceContainer;
 
     private userRepository: UserRepository;
+    private feedbackRepository: FeedbackRepository;
     private userService: UserService;
     private authService: AuthService;
+    private feedbackService: FeedbackService;
 
     private constructor() {
         // Initialize repositories
         this.userRepository = new UserRepository();
+        this.feedbackRepository = new FeedbackRepository();
 
         // Initialize services with dependencies
         this.userService = new UserService(this.userRepository);
         this.authService = new AuthService(this.userService);
+        this.feedbackService = new FeedbackService(this.feedbackRepository);
     }
 
     /**
@@ -47,10 +53,24 @@ export class ServiceContainer {
     }
 
     /**
+     * Get FeedbackService instance
+     */
+    getFeedbackService(): FeedbackService {
+        return this.feedbackService;
+    }
+
+    /**
      * Get UserRepository instance (for direct access if needed)
      */
     getUserRepository(): UserRepository {
         return this.userRepository;
+    }
+
+    /**
+     * Get FeedbackRepository instance (for direct access if needed)
+     */
+    getFeedbackRepository(): FeedbackRepository {
+        return this.feedbackRepository;
     }
 
     /**
@@ -60,6 +80,3 @@ export class ServiceContainer {
         ServiceContainer.instance = new ServiceContainer();
     }
 }
-
-
-

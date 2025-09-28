@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase-admin';
 import { addCorsHeaders, handleCorsPreflight } from '@/lib/cors';
+import { getUserByApiKey } from '@/lib/firestore-server';
 
 // Handle CORS preflight requests
 export async function OPTIONS() {
     return handleCorsPreflight();
 }
 
+/**
+ * POST event tracking
+ * Uses API key authentication for SDK compatibility
+ * Admin portal uses different authentication method
+ */
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
@@ -22,8 +28,18 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(response, origin);
         }
 
-        // TODO: Add API key validation here
-        // For now, we'll accept any API key
+        // Validate API key and get user (SDK authentication)
+        console.log('🔍 Debug: Validating API key for event tracking');
+        const user = await getUserByApiKey(body.apiKey);
+        if (!user) {
+            const response = NextResponse.json(
+                { error: 'Invalid API key' },
+                { status: 401 }
+            );
+            return addCorsHeaders(response, origin);
+        }
+
+        console.log('✅ Debug: API key validated for user:', user.email);
 
         // Prepare event data for Firestore
         const eventData = {
@@ -31,6 +47,8 @@ export async function POST(request: NextRequest) {
             eventName: body.eventName,
             eventData: body.eventData || {},
             userInfo: body.userInfo || {},
+            userId: user.id,
+            userEmail: user.email,
             metadata: {
                 userAgent: request.headers.get('user-agent') || '',
                 ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '',

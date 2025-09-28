@@ -2,142 +2,189 @@ import {
     collection,
     doc,
     getDocs,
+    getDoc,
+    addDoc,
     updateDoc,
     query,
     where,
     orderBy,
     limit,
+    Timestamp,
+    CollectionReference
 } from 'firebase/firestore';
-import { db } from './firebase';
-import { User, Feedback, Website, Analytics } from '@/types';
+import { db } from '@/lib/firebase';
+import { User, WidgetConfig, Analytics, Feedback } from '@/types';
 
-// Users collection
-export const usersCollection = collection(db, 'users');
+// Collections
+const usersCollection = collection(db, 'users') as CollectionReference<User>;
+const feedbackCollection = collection(db, 'feedback') as CollectionReference<Feedback>;
+const websitesCollection = collection(db, 'websites');
 
-export async function getUsers(): Promise<User[]> {
-    const snapshot = await getDocs(usersCollection);
-    return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-        lastLogin: doc.data().lastLogin?.toDate(),
-    })) as User[];
-}
-
+// User functions
 export async function getUser(uid: string): Promise<User | null> {
-    const q = query(usersCollection, where('uid', '==', uid));
-    const querySnapshot = await getDocs(q);
+    const q = query(usersCollection, where('uid', '==', uid), limit(1));
+    const snapshot = await getDocs(q);
 
-    if (!querySnapshot.empty) {
-        const doc = querySnapshot.docs[0];
-        const data = doc.data();
-        return {
-            id: doc.id,
-            ...data,
-            createdAt: data.createdAt?.toDate() || new Date(),
-            lastLogin: data.lastLogin?.toDate(),
-        } as User;
-    }
-    return null;
+    if (snapshot.empty) return null;
+
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+    return {
+        id: doc.id,
+        uid: data.uid,
+        email: data.email,
+        name: data.name,
+        createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+        lastLogin: data.lastLogin instanceof Timestamp ? data.lastLogin.toDate() : undefined,
+        isActive: data.isActive,
+        apiKey: data.apiKey,
+        sdkConfig: data.sdkConfig,
+    } as User;
 }
 
 export async function updateUser(uid: string, data: Partial<User>): Promise<void> {
-    // First find the user document by UID
-    const q = query(usersCollection, where('uid', '==', uid));
-    const querySnapshot = await getDocs(q);
-    
-    if (querySnapshot.empty) {
-        throw new Error(`User with UID ${uid} not found`);
+    const userDoc = await getUser(uid);
+    if (!userDoc) throw new Error('User not found');
+
+    // Only update allowed fields
+    const updateData: Record<string, unknown> = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.isActive !== undefined) updateData.isActive = data.isActive;
+    if (data.sdkConfig !== undefined) updateData.sdkConfig = data.sdkConfig;
+    if (data.lastLogin) {
+        updateData.lastLogin = Timestamp.fromDate(data.lastLogin);
     }
-    
-    const userDoc = querySnapshot.docs[0];
-    const docRef = doc(db, 'users', userDoc.id);
-    await updateDoc(docRef, data);
+
+    await updateDoc(doc(usersCollection, userDoc.id), updateData);
 }
 
-// Feedback collection
-export const feedbackCollection = collection(db, 'feedback');
+export async function createUser(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
+    const now = Timestamp.now();
+    const docRef = await addDoc(usersCollection, {
+        uid: userData.uid,
+        email: userData.email,
+        name: userData.name,
+        isActive: userData.isActive,
+        apiKey: userData.apiKey,
+        sdkConfig: userData.sdkConfig,
+        createdAt: now,
+    } as unknown as User);
 
-export async function getFeedback(): Promise<Feedback[]> {
-    const q = query(feedbackCollection, orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-    })) as Feedback[];
+    return {
+        id: docRef.id,
+        ...userData,
+        createdAt: now.toDate(),
+        updatedAt: now.toDate(),
+    } as User;
 }
 
-export async function getFeedbackByUser(userId: string): Promise<Feedback[]> {
+// Website functions
+export async function getWebsite(websiteId: string): Promise<WidgetConfig | null> {
+    const websiteDoc = await getDoc(doc(websitesCollection, websiteId));
+    if (!websiteDoc.exists()) return null;
+
+    return websiteDoc.data() as WidgetConfig;
+}
+
+export async function updateWebsite(websiteId: string, config: Partial<WidgetConfig>): Promise<void> {
+    await updateDoc(doc(websitesCollection, websiteId), {
+        ...config,
+        updatedAt: Timestamp.now(),
+    });
+}
+
+export async function createWebsite(websiteId: string, config: WidgetConfig): Promise<void> {
+    await addDoc(websitesCollection, {
+        id: websiteId,
+        ...config,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+    });
+}
+
+// Feedback functions
+export async function getFeedback(websiteId: string): Promise<Feedback[]> {
     const q = query(
         feedbackCollection,
-        where('userId', '==', userId),
+        where('websiteId', '==', websiteId),
         orderBy('createdAt', 'desc')
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-    })) as Feedback[];
+
+    return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            userId: data.userId,
+            content: data.content,
+            rating: data.rating,
+            category: data.category,
+            sentiment: data.sentiment,
+            createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+            processed: data.processed,
+            aiAnalysis: data.aiAnalysis,
+        } as Feedback;
+    });
 }
 
 export async function getRecentFeedback(limitCount: number = 10): Promise<Feedback[]> {
-    const q = query(
-        feedbackCollection,
-        orderBy('createdAt', 'desc'),
-        limit(limitCount)
-    );
+    const q = query(feedbackCollection, orderBy('createdAt', 'desc'), limit(limitCount));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-    })) as Feedback[];
+
+    return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            userId: data.userId,
+            content: data.content,
+            rating: data.rating,
+            category: data.category,
+            sentiment: data.sentiment,
+            createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+            processed: data.processed,
+            aiAnalysis: data.aiAnalysis,
+        } as Feedback;
+    });
 }
 
-export async function updateFeedback(feedbackId: string, data: Partial<Feedback>): Promise<void> {
-    const docRef = doc(db, 'feedback', feedbackId);
-    await updateDoc(docRef, data);
+export async function getFeedbackStats(websiteId: string): Promise<{
+    total: number;
+    averageRating: number;
+    categories: Record<string, number>;
+}> {
+    const feedback = await getFeedback(websiteId);
+    
+    const total = feedback.length;
+    const ratings = feedback.filter(f => f.rating !== null && f.rating !== undefined).map(f => f.rating!);
+    const averageRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
+    
+    const categories: Record<string, number> = {};
+    feedback.forEach(f => {
+        if (f.category) {
+            categories[f.category] = (categories[f.category] || 0) + 1;
+        }
+    });
+
+    return { total, averageRating, categories };
 }
 
-// Websites collection
-export const websitesCollection = collection(db, 'websites');
-
-export async function getWebsites(): Promise<Website[]> {
+// Website management
+export async function getWebsites(): Promise<{ id: string; config: WidgetConfig }[]> {
     const snapshot = await getDocs(websitesCollection);
     return snapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-    })) as Website[];
+        config: doc.data() as WidgetConfig,
+    }));
 }
 
-export async function getWebsitesByUser(userId: string): Promise<Website[]> {
-    const q = query(websitesCollection, where('userId', '==', userId));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-    })) as Website[];
-}
-
-// Resolve a user's default website. Strategy:
-// 1) websites where userId == uid and isActive true, order by createdAt desc, take first
-// 2) fallback to any website by the user
 export async function getDefaultWebsiteIdForUser(uid: string): Promise<string | null> {
-    const q = query(
-        websitesCollection,
-        where('userId', '==', uid),
-        orderBy('createdAt', 'desc')
-    );
+    const q = query(websitesCollection, where('user', '==', uid));
     const snapshot = await getDocs(q);
+
     if (snapshot.empty) return null;
-    const active = snapshot.docs.find(d => {
-        const data = d.data();
-        return data.isActive === true;
-    });
+
+    // Find active website or return first one
+    const active = snapshot.docs.find(doc => doc.data().isActive);
     return (active ?? snapshot.docs[0]).id;
 }
 
@@ -152,9 +199,36 @@ export async function getUserByApiKey(apiKey: string): Promise<User | null> {
     const data = doc.data();
     return {
         id: doc.id,
-        ...data,
-        createdAt: data.createdAt?.toDate() || new Date(),
-        lastLogin: data.lastLogin?.toDate(),
+        uid: data.uid,
+        email: data.email,
+        name: data.name,
+        createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+        lastLogin: data.lastLogin instanceof Timestamp ? data.lastLogin.toDate() : undefined,
+        isActive: data.isActive,
+        apiKey: data.apiKey,
+        sdkConfig: data.sdkConfig,
+    } as User;
+}
+
+// NEW: Get user by Firebase UID (for admin portal)
+export async function getUserByUid(uid: string): Promise<User | null> {
+    const q = query(usersCollection, where('uid', '==', uid));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) return null;
+
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+    return {
+        id: doc.id,
+        uid: data.uid,
+        email: data.email,
+        name: data.name,
+        createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+        lastLogin: data.lastLogin instanceof Timestamp ? data.lastLogin.toDate() : undefined,
+        isActive: data.isActive,
+        apiKey: data.apiKey,
+        sdkConfig: data.sdkConfig,
     } as User;
 }
 
@@ -165,55 +239,60 @@ export async function getAnalytics(): Promise<Analytics> {
         getDocs(feedbackCollection),
     ]);
 
-    const users = usersSnapshot.docs.map(doc => doc.data());
-    const feedback = feedbackSnapshot.docs.map(doc => ({
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-    })) as Feedback[];
-
-    const totalUsers = users.length;
-    const totalFeedback = feedback.length;
-
-    const ratings = feedback
-        .filter(f => f.rating !== undefined)
+    const totalUsers = usersSnapshot.size;
+    const totalFeedback = feedbackSnapshot.size;
+    
+    // Calculate average rating from all feedback
+    const allFeedback = feedbackSnapshot.docs.map(doc => doc.data());
+    const ratings = allFeedback
+        .filter(f => f.rating !== null && f.rating !== undefined)
         .map(f => f.rating!);
-    const averageRating = ratings.length > 0
-        ? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
+    
+    const averageRating = ratings.length > 0 
+        ? ratings.reduce((a, b) => a + b, 0) / ratings.length 
         : 0;
 
-    const sentimentDistribution: { positive: number; negative: number; neutral: number } = feedback.reduce((acc, f) => {
-        const sentiment = f.sentiment || 'neutral';
-        if (sentiment === 'positive' || sentiment === 'negative' || sentiment === 'neutral') {
-            acc[sentiment] = (acc[sentiment] || 0) + 1;
+    // Calculate sentiment distribution
+    const sentimentDistribution = {
+        positive: allFeedback.filter(f => f.sentiment === 'positive').length,
+        negative: allFeedback.filter(f => f.sentiment === 'negative').length,
+        neutral: allFeedback.filter(f => f.sentiment === 'neutral' || !f.sentiment).length,
+    };
+
+    // Calculate feedback by category
+    const feedbackByCategory: Record<string, number> = {};
+    allFeedback.forEach(f => {
+        if (f.category) {
+            feedbackByCategory[f.category] = (feedbackByCategory[f.category] || 0) + 1;
         }
-        return acc;
-    }, { positive: 0, negative: 0, neutral: 0 });
+    });
 
-    const feedbackByCategory = feedback.reduce((acc, f) => {
-        const category = f.category || 'uncategorized';
-        acc[category] = (acc[category] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
-
-    // Recent activity (last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-    const recentUsers = users.filter(user => {
-        const createdAt = user.createdAt?.toDate ? user.createdAt.toDate() : new Date(user.createdAt);
-        return createdAt > sevenDaysAgo;
+    // Calculate recent activity (last 7 days)
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    
+    const recentUsers = usersSnapshot.docs.filter(doc => {
+        const createdAt = doc.data().createdAt;
+        if (createdAt instanceof Timestamp) {
+            return createdAt.toDate() > weekAgo;
+        }
+        return false;
     }).length;
 
-    const recentFeedback = feedback.filter(f =>
-        f.createdAt > sevenDaysAgo
-    ).length;
+    const recentFeedback = feedbackSnapshot.docs.filter(doc => {
+        const createdAt = doc.data().createdAt;
+        if (createdAt instanceof Timestamp) {
+            return createdAt.toDate() > weekAgo;
+        }
+        return false;
+    }).length;
 
-    const processedFeedback = feedback.filter(f => f.processed).length;
+    const processedFeedback = allFeedback.filter(f => f.processed).length;
 
     return {
         totalUsers,
         totalFeedback,
-        averageRating: Math.round(averageRating * 10) / 10,
+        averageRating,
         sentimentDistribution,
         feedbackByCategory,
         recentActivity: {

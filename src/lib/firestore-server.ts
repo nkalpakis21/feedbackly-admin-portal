@@ -8,6 +8,7 @@ import { User, WidgetConfig } from '@/types';
 
 /**
  * Get user by API key (server-side)
+ * Used by SDK for external authentication
  */
 export async function getUserByApiKey(apiKey: string): Promise<User | null> {
     try {
@@ -41,6 +42,46 @@ export async function getUserByApiKey(apiKey: string): Promise<User | null> {
         } as User;
     } catch (error) {
         console.error('Error getting user by API key:', error);
+        return null;
+    }
+}
+
+/**
+ * Get user by Firebase UID (server-side)
+ * Used by admin portal for internal authentication
+ */
+export async function getUserByUid(uid: string): Promise<User | null> {
+    try {
+        console.log('🔍 Debug: getUserByUid called with:', uid);
+        if (!adminDb) {
+            console.warn('❌ Firebase Admin not initialized - returning null for getUserByUid');
+            return null;
+        }
+
+        const usersRef = adminDb.collection('users');
+        const snapshot = await usersRef.where('uid', '==', uid).limit(1).get();
+
+        if (snapshot.empty) {
+            console.log('❌ No user found with UID:', uid);
+            return null;
+        }
+
+        const doc = snapshot.docs[0];
+        const data = doc.data();
+
+        return {
+            id: doc.id,
+            uid: data.uid,
+            email: data.email,
+            name: data.name,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            lastLogin: data.lastLogin?.toDate(),
+            isActive: data.isActive,
+            apiKey: data.apiKey,
+            sdkConfig: data.sdkConfig,
+        } as User;
+    } catch (error) {
+        console.error('Error getting user by UID:', error);
         return null;
     }
 }
@@ -132,6 +173,7 @@ export async function updateUserSdkConfig(userId: string, sdkConfig: WidgetConfi
             sdkConfig,
             updatedAt: new Date(),
         });
+
         return true;
     } catch (error) {
         console.error('Error updating user SDK config:', error);
