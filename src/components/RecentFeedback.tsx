@@ -1,29 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getRecentFeedback } from '@/lib/firestore';
-import { Feedback } from '@/types';
+import { useUserFeedback } from '@/hooks/useFeedback';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 export default function RecentFeedback() {
-  const [feedback, setFeedback] = useState<Feedback[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchFeedback = async () => {
-      try {
-        const data = await getRecentFeedback(5);
-        setFeedback(data);
-      } catch (error) {
-        console.error('Error fetching recent feedback:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFeedback();
-  }, []);
+  const { currentUser } = useAuth();
+  console.log('currentUser', currentUser);
+  const { feedback, loading, error, refetch } = useUserFeedback({ 
+    userId: currentUser?.uid || '' 
+  });
 
   const getSentimentVariant = (sentiment?: string) => {
     switch (sentiment) {
@@ -36,13 +23,26 @@ export default function RecentFeedback() {
     }
   };
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date);
+  const formatDate = (date: Date | string | number) => {
+    try {
+      // Convert to Date object if it's not already
+      const dateObj = date instanceof Date ? date : new Date(date);
+      
+      // Check if the date is valid
+      if (isNaN(dateObj.getTime())) {
+        return 'Invalid date';
+      }
+      
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(dateObj);
+    } catch (error) {
+      console.error('Error formatting date:', error, 'Original date:', date);
+      return 'Invalid date';
+    }
   };
 
   if (loading) {
@@ -59,6 +59,42 @@ export default function RecentFeedback() {
                 <div className="h-3 bg-muted rounded w-1/2"></div>
               </div>
             ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Feedback</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center">
+            <p className="text-destructive">Error loading feedback: {error}</p>
+            <button
+              onClick={refetch}
+              className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+            >
+              Retry
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Feedback</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center">
+            <p className="text-muted-foreground">Please log in to view your feedback</p>
           </div>
         </CardContent>
       </Card>

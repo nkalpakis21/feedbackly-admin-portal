@@ -1,29 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getAnalytics } from '@/lib/firestore';
-import { Analytics } from '@/types';
+import { useUserAnalytics } from '@/hooks/useUserAnalytics';
 import { Card, CardContent } from '@/components/ui/card';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 export default function DashboardStats() {
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const data = await getAnalytics();
-        setAnalytics(data);
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnalytics();
-  }, []);
+  const { userAnalytics, loading, error, refetch } = useUserAnalytics();
 
   if (loading) {
     return (
@@ -40,12 +22,41 @@ export default function DashboardStats() {
     );
   }
 
-  if (!analytics) {
-    return <div>Error loading analytics</div>;
+  if (error) {
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card className="col-span-full">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-destructive">Error loading analytics: {error}</p>
+              <button
+                onClick={refetch}
+                className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+              >
+                Retry
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
-  // Sample chart data
-  const chartData = [
+  if (!userAnalytics) {
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card className="col-span-full">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-muted-foreground">No analytics data available</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const data = [
     { name: 'Jan', value: 400 },
     { name: 'Feb', value: 300 },
     { name: 'Mar', value: 600 },
@@ -57,7 +68,7 @@ export default function DashboardStats() {
   const stats = [
     {
       name: 'Total Feedback',
-      value: analytics.totalFeedback,
+      value: userAnalytics.totalFeedback ?? 0,
       change: '+20.1% from last month',
       icon: '💬',
       color: 'text-chart-1',
@@ -66,7 +77,7 @@ export default function DashboardStats() {
     },
     {
       name: 'Average Rating',
-      value: analytics.averageRating.toFixed(1),
+      value: (userAnalytics.averageRating ?? 0).toFixed(1),
       change: '+0.3 from last month',
       icon: '⭐',
       color: 'text-chart-4',
@@ -75,7 +86,7 @@ export default function DashboardStats() {
     },
     {
       name: 'Processed Feedback',
-      value: analytics.recentActivity.processedFeedback,
+      value: userAnalytics.recentActivity?.processedFeedback ?? 0,
       change: '+12.5% from last month',
       icon: '✅',
       color: 'text-chart-2',
@@ -86,46 +97,43 @@ export default function DashboardStats() {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {stats.map((stat) => (
-        <Card key={stat.name} style={{ borderLeftColor: stat.borderColor, borderLeftWidth: '4px' }}>
+      {stats.map((stat, index) => (
+        <Card key={index} style={{ borderLeftColor: stat.borderColor, borderLeftWidth: '4px' }}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="flex-shrink-0">
-                  <span className="text-2xl">{stat.icon}</span>
+                  <span className={`text-2xl ${stat.color}`}>{stat.icon}</span>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
                     {stat.name}
                   </p>
-                  <p className={`text-2xl font-bold ${stat.color}`}>
+                  <p className="text-2xl font-bold" style={{ color: stat.borderColor }}>
                     {stat.value}
                   </p>
                 </div>
+              </div>
+              <div className="h-[60px] w-[120px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={data}>
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke={stat.chartColor}
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
               {stat.change}
             </p>
-            <div className="mt-4 h-16">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <Line 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke={stat.chartColor}
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
           </CardContent>
         </Card>
       ))}
     </div>
   );
 }
-
-
-
